@@ -8,7 +8,9 @@ public enum ExceptionWithCode {
     INCORRECT_INPUT_PARAMETERS(5, "Incorrect input parameters"),
     INVALID_TAG_NAME(6,"Cannot add tag with this name"),
     NOT_FOUND_CERTIFICATES(7,"No certificates found"),
-    NOT_FOUND_TAGS(8,"No tags found");
+    NOT_FOUND_TAGS(8,"No tags found"),
+    INVALID_CERTIFICATE_NAME(9,"Invalid certificate name."),
+    CERTIFICATE_WITH_NAME_NOT_FOUND(10,"Certificate with this name not found.");
 
     private final int id;
     private final String message;

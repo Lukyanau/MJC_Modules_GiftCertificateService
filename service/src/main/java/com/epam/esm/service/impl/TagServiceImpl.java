@@ -12,12 +12,10 @@ import com.epam.esm.model_mapper.TagMapper;
 import com.epam.esm.repositoty.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -50,7 +48,17 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDTO getTagById(long id) throws NotFoundException, InvalidIdException {
         tagValidator.checkTagDTOId(id);
-        Tag tag = tagRepository.get(id);
+        Tag tag = tagRepository.getById(id);
+        if (tag == null) {
+            throw new NotFoundException(ExceptionWithCode.TAG_WITH_ID_NOT_FOUND.toString());
+        }
+        return tagMapper.convertToDTO(tag);
+    }
+
+    @Override
+    public TagDTO getTagByName(String name) throws NotFoundException, InvalidNameException {
+        tagValidator.checkTagDTOName(name);
+        Tag tag = tagRepository.getByName(name);
         if (tag == null) {
             throw new NotFoundException(ExceptionWithCode.TAG_WITH_ID_NOT_FOUND.toString());
         }

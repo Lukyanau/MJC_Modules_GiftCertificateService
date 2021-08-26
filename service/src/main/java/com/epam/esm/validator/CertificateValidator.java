@@ -3,6 +3,7 @@ package com.epam.esm.validator;
 import com.epam.esm.dto.RequestCertificateDTO;
 import com.epam.esm.exception.IncorrectInputParametersException;
 import com.epam.esm.exception.InvalidIdException;
+import com.epam.esm.exception.InvalidNameException;
 import com.epam.esm.exception.exception_code.ExceptionWithCode;
 
 import java.math.BigDecimal;
@@ -28,8 +29,10 @@ public class CertificateValidator {
     private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{1,30})+$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
-    public void validateCertificateDTO(RequestCertificateDTO certificateDTO) throws IncorrectInputParametersException {
-        if (!checkCertificateDTOName(certificateDTO.getName()) && checkCertificateDTODescription(certificateDTO.getDescription())
+    public void validateCertificateDTO(RequestCertificateDTO certificateDTO) throws IncorrectInputParametersException,
+            InvalidNameException {
+        checkCertificateDTOName(certificateDTO.getName());
+        if (!checkCertificateDTODescription(certificateDTO.getDescription())
                 && checkCertificateDTOPrice(certificateDTO.getPrice()) && checkCertificateDTODuration(certificateDTO.getDuration())) {
             throw new IncorrectInputParametersException(ExceptionWithCode.INCORRECT_INPUT_PARAMETERS.toString());
         }
@@ -41,8 +44,10 @@ public class CertificateValidator {
         }
     }
 
-    public boolean checkCertificateDTOName(String name) {
-        return notEmptyOrNull(name) && name.matches(NAME_REGEX);
+    public void checkCertificateDTOName(String name) throws InvalidNameException {
+        if(!notEmptyOrNull(name) && name.matches(NAME_REGEX)){
+            throw new InvalidNameException(ExceptionWithCode.INVALID_CERTIFICATE_NAME.toString());
+        };
     }
 
     public boolean checkCertificateDTODescription(String description) {

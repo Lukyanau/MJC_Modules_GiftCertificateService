@@ -7,7 +7,8 @@ import java.util.List;
 @Repository
 public interface BaseRepository<T> {
     T add(T t);
-    T get(long id);
+    T getById(long id);
+    T getByName(String name);
     boolean delete(long id);
     List<T> getAll();
 }

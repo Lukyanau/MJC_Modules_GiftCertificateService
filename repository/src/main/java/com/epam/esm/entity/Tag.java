@@ -53,8 +53,8 @@ public class Tag {
 
     @Override
     public String toString() {
-        return "Tag:" + "\n" +
-                "id=" + id + "\n" +
-                "name='" + name;
+        return "Tag:"  +
+                " id= " + id  +
+                " name= " + name + "\n";
     }
 }

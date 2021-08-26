@@ -22,10 +22,17 @@ public class TagController {
     }
 
     @GetMapping(value = "/id")
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler({NotFoundException.class, InvalidIdException.class})
     //todo handle exceptions
     public TagDTO getTagById(@RequestParam("id") long id) throws NotFoundException, InvalidIdException {
         return tagService.getTagById(id);
+    }
+
+    @GetMapping(value = "/name")
+    @ExceptionHandler({NotFoundException.class, javax.naming.InvalidNameException.class})
+    //todo handle exceptions
+    public TagDTO getTagById(@RequestParam("name") String name) throws NotFoundException, InvalidNameException {
+        return tagService.getTagByName(name);
     }
 
     @PostMapping

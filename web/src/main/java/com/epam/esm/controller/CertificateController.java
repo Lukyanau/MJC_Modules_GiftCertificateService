@@ -4,6 +4,7 @@ import com.epam.esm.dto.RequestCertificateDTO;
 import com.epam.esm.dto.ResponseCertificateDTO;
 import com.epam.esm.exception.IncorrectInputParametersException;
 import com.epam.esm.exception.InvalidIdException;
+import com.epam.esm.exception.InvalidNameException;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.service.impl.CertificateServiceImpl;
 import org.springframework.stereotype.Controller;
@@ -22,13 +23,20 @@ public class CertificateController {
     }
 
     @GetMapping(value = "/id")
-    public ResponseCertificateDTO getCertificateById(@RequestParam("id") long id) throws InvalidIdException, NotFoundException {
+    public ResponseCertificateDTO getCertificateById(@RequestParam("id") long id)
+            throws InvalidIdException, NotFoundException {
         return certificateService.getCertificateById(id);
+    }
+
+    @GetMapping(value = "/name")
+    public ResponseCertificateDTO getCertificateByName(@RequestParam("name") String name)
+            throws  NotFoundException, InvalidNameException {
+        return certificateService.getCertificateByName(name);
     }
 
     @PostMapping
     public ResponseCertificateDTO addCertificate(@RequestBody RequestCertificateDTO certificateDTO)
-            throws IncorrectInputParametersException {
+            throws IncorrectInputParametersException, InvalidNameException {
         return certificateService.addCertificate(certificateDTO);
     }
 
