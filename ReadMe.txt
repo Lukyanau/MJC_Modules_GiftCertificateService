@@ -1,1 +1,0 @@
-This is MJC_Modules repository

@@ -21,6 +21,7 @@ public class TagController {
     @GetMapping
     @ResponseBody
     public List<TagDTO> getTags() {
+        System.out.println("server is working");
         return tagService.getTags();
     }
 
