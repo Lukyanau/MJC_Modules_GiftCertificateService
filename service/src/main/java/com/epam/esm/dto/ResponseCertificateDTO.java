@@ -14,7 +14,7 @@ public class ResponseCertificateDTO {
     private int duration;
     private LocalDateTime created;
     private LocalDateTime updated;
-    private List<Tag> certificateTags;
+    private List<TagDTO> certificateTags;
 
     public long getId() {
         return id;
@@ -72,11 +72,11 @@ public class ResponseCertificateDTO {
         this.updated = updated;
     }
 
-    public List<Tag> getCertificateTags() {
+    public List<TagDTO> getCertificateTags() {
         return certificateTags;
     }
 
-    public void setCertificateTags(List<Tag> certificateTags) {
+    public void setCertificateTags(List<TagDTO> certificateTags) {
         this.certificateTags = certificateTags;
     }
 }

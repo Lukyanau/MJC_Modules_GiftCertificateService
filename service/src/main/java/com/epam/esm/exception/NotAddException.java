@@ -1,27 +1,30 @@
 package com.epam.esm.exception;
 
-import com.epam.esm.exception.exception_code.ExceptionWithCode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvalidIdException extends RuntimeException {
+public class NotAddException extends RuntimeException {
     private String errorCode;
     private String message;
 
-    public InvalidIdException() {
+    public NotAddException() {
     }
 
-    public InvalidIdException(String errorCode, String message) {
+    public NotAddException(String errorCode, String message) {
         super();
         this.errorCode = errorCode;
         this.message = message;
     }
 
-    public InvalidIdException(String message, Throwable cause) {
+    public NotAddException(String message) {
+        super(message);
+    }
+
+    public NotAddException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidIdException(Throwable cause) {
+    public NotAddException(Throwable cause) {
         super(cause);
     }
 
@@ -33,5 +36,4 @@ public class InvalidIdException extends RuntimeException {
     public String getMessage() {
         return message;
     }
-
 }

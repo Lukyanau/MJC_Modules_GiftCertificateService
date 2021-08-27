@@ -11,7 +11,7 @@ public class RequestCertificateDTO {
     private String description;
     private BigDecimal price;
     private int duration;
-    private List<Tag> certificateTags;
+    private List<TagDTO> certificateTags;
 
     public long getId() {
         return id;
@@ -53,11 +53,11 @@ public class RequestCertificateDTO {
         this.duration = duration;
     }
 
-    public List<Tag> getCertificateTags() {
+    public List<TagDTO> getCertificateTags() {
         return certificateTags;
     }
 
-    public void setCertificateTags(List<Tag> certificateTags) {
+    public void setCertificateTags(List<TagDTO> certificateTags) {
         this.certificateTags = certificateTags;
     }
 }

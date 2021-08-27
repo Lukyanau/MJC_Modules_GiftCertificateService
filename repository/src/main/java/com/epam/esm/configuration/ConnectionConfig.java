@@ -3,10 +3,12 @@ package com.epam.esm.configuration;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
+@ComponentScan("com.epam.esm")
 public class ConnectionConfig {
     @Bean
     public HikariDataSource hikari(){
@@ -27,7 +29,7 @@ public class ConnectionConfig {
     }
 
     @Bean
-    public JdbcTemplate jdbc(){
+    public JdbcTemplate jdbcTemplate(){
         return new JdbcTemplate(hikari());
     }
 

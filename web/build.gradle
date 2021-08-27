@@ -18,6 +18,8 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.8'
     implementation group: 'org.springframework', name: 'spring-context', version: '5.3.8'
     implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.8'
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+
 
 }
 

@@ -2,6 +2,7 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.RequestCertificateDTO;
 import com.epam.esm.dto.ResponseCertificateDTO;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.IncorrectInputParametersException;
 import com.epam.esm.exception.InvalidIdException;
 import com.epam.esm.exception.InvalidNameException;
@@ -17,4 +18,7 @@ public interface CertificateService {
             throws IncorrectInputParametersException, InvalidNameException;
     ResponseCertificateDTO updateCertificate(RequestCertificateDTO certificateDTO);
     boolean deleteCertificateById(long id) throws NotFoundException, InvalidIdException;
+    List<ResponseCertificateDTO> getCertificatesByTag(String tagName);
+    List<ResponseCertificateDTO> getCertificatesByPartOfName(String partOfName);
+    List<ResponseCertificateDTO> getCertificatesByPartOfDescription(String partOfDescription);
 }

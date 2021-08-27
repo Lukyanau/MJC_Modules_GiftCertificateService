@@ -1,12 +1,11 @@
 package com.epam.esm.repositoty.impl;
 
-import com.epam.esm.configuration.ConnectionConfig;
-import com.epam.esm.dao.impl.CertificateDaoImpl;
-import com.epam.esm.dao.impl.TagDaoImpl;
+import com.epam.esm.dao.SqlQuery;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repositoty.CertificateRepository;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,66 +13,50 @@ import java.util.List;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
-    AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ConnectionConfig.class);
-    CertificateDaoImpl certificateDao = new CertificateDaoImpl(applicationContext.getBean(JdbcTemplate.class));
-    TagDaoImpl tagDao = new TagDaoImpl(applicationContext.getBean(JdbcTemplate.class));
 
-    private static final CertificateRepositoryImpl instance = new CertificateRepositoryImpl();
+    private final JdbcTemplate jdbcTemplate;
 
-    private CertificateRepositoryImpl() {
-    }
-
-    public static CertificateRepositoryImpl getInstance() {
-        return instance;
+    @Autowired
+    public CertificateRepositoryImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public GiftCertificate add(GiftCertificate giftCertificate) {
-        GiftCertificate addedCertificate = certificateDao.add(giftCertificate);
-        addedCertificate.setId(certificateDao.getByName(addedCertificate.getName()).getId());
-        for (Tag tag : addedCertificate.getCertificateTags()) {
-            if (tagDao.getByName(tag.getName()) != null) {
-                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tag.getId());
-            } else {
-                tagDao.add(tag);
-                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tagDao.getByName(tag.getName()).getId());
-            }
-        }
-        return addedCertificate;
+//        GiftCertificate addedCertificate = certificateDao.add(giftCertificate);
+//        addedCertificate.setId(certificateDao.getByName(addedCertificate.getName()).getId());
+//        for (Tag tag : addedCertificate.getCertificateTags()) {
+//            if (tagDao.getByName(tag.getName()) != null) {
+//                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tag.getId());
+//            } else {
+//                tagDao.add(tag);
+//                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tagDao.getByName(tag.getName()).getId());
+//            }
+//        }
+//        return addedCertificate;
+        return null;
     }
 
     @Override
     public GiftCertificate getById(long id) {
-        GiftCertificate receivedCertificate = certificateDao.getById(id);
-        if (receivedCertificate != null) {
-            receivedCertificate.setCertificateTags(tagDao.getTagsByCertificateName(receivedCertificate.getName()));
-        }
-        return receivedCertificate;
+        return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_BY_ID,
+                new BeanPropertyRowMapper<>(GiftCertificate.class), id).stream().findAny().orElse(null);
     }
 
     @Override
     public GiftCertificate getByName(String name) {
-        GiftCertificate receivedCertificate = certificateDao.getByName(name);
-        if (receivedCertificate != null) {
-            receivedCertificate.setCertificateTags(tagDao.getTagsByCertificateName(receivedCertificate.getName()));
-        }
-        return receivedCertificate;
+        return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_BY_NAME,
+                new BeanPropertyRowMapper<>(GiftCertificate.class), name).stream().findAny().orElse(null);
+    }
+
+    @Override
+    public List<GiftCertificate> getAll() {
+        return jdbcTemplate.query(SqlQuery.GET_ALL_CERTIFICATES, new BeanPropertyRowMapper<>(GiftCertificate.class));
     }
 
     @Override
     public boolean delete(long id) {
         return false;
-    }
-
-    @Override
-    public List<GiftCertificate> getAll() {
-        List<GiftCertificate> allCertificates = certificateDao.getAll();
-        if (allCertificates != null) {
-            for (GiftCertificate certificate : allCertificates) {
-                certificate.setCertificateTags(tagDao.getTagsByCertificateName(certificate.getName()));
-            }
-        }
-        return allCertificates;
     }
 
     @Override

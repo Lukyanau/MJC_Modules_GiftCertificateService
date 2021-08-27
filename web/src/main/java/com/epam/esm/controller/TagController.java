@@ -1,47 +1,50 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDTO;
-import com.epam.esm.exception.InvalidIdException;
-import com.epam.esm.exception.InvalidNameException;
-import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.service.impl.TagServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/tags")
 public class TagController {
+    private final TagServiceImpl tagService;
 
-    private final TagServiceImpl tagService = TagServiceImpl.getInstance();
+    @Autowired
+    public TagController(TagServiceImpl tagService) {
+        this.tagService = tagService;
+    }
 
     @GetMapping
-    public List<TagDTO> getTags() throws NotFoundException {
+    @ResponseBody
+    public List<TagDTO> getTags() {
         return tagService.getTags();
     }
 
     @GetMapping(value = "/id")
-    @ExceptionHandler({NotFoundException.class, InvalidIdException.class})
-    //todo handle exceptions
-    public TagDTO getTagById(@RequestParam("id") long id) throws NotFoundException, InvalidIdException {
+    @ResponseBody
+    public TagDTO getTagById(@RequestParam("id") long id) {
         return tagService.getTagById(id);
     }
 
     @GetMapping(value = "/name")
-    @ExceptionHandler({NotFoundException.class, javax.naming.InvalidNameException.class})
-    //todo handle exceptions
-    public TagDTO getTagById(@RequestParam("name") String name) throws NotFoundException, InvalidNameException {
+    @ResponseBody
+    public TagDTO getTagById(@RequestParam("name") String name) {
         return tagService.getTagByName(name);
     }
 
     @PostMapping
-    public TagDTO addTag(@RequestBody TagDTO tagDTO) throws InvalidNameException {
+    @ResponseBody
+    public TagDTO addTag(@RequestBody TagDTO tagDTO) {
         return tagService.addTag(tagDTO);
     }
 
     @DeleteMapping
-    public boolean deleteTagById(@RequestParam("id") long id) throws NotFoundException, InvalidIdException {
+    @ResponseBody
+    public boolean deleteTagById(@RequestParam("id") long id) {
         return tagService.deleteTagById(id);
     }
 }

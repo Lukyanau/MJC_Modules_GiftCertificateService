@@ -1,9 +1,19 @@
 package com.epam.esm.exception;
 
-import com.epam.esm.exception.exception_code.ExceptionWithCode;
+import org.springframework.stereotype.Component;
 
-public class NotFoundException extends Exception {
+@Component
+public class NotFoundException extends RuntimeException {
+    private String errorCode;
+    private String message;
+
     public NotFoundException() {
+    }
+
+    public NotFoundException(String errorCode, String message) {
+        super();
+        this.errorCode = errorCode;
+        this.message = message;
     }
 
     public NotFoundException(String message) {
@@ -16,5 +26,14 @@ public class NotFoundException extends Exception {
 
     public NotFoundException(Throwable cause) {
         super(cause);
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

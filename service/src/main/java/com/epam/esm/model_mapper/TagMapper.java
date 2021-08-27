@@ -2,8 +2,11 @@ package com.epam.esm.model_mapper;
 
 import com.epam.esm.dto.TagDTO;
 import com.epam.esm.entity.Tag;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TagMapper {
+
     public Tag convertToEntity(TagDTO tagDTO) {
         Tag tag = new Tag();
         tag.setId(tagDTO.getId());

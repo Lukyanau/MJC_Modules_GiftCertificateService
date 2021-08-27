@@ -1,81 +1,85 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.ResponseCertificateDTO;
 import com.epam.esm.dto.TagDTO;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.InvalidIdException;
-import com.epam.esm.exception.InvalidNameException;
+import com.epam.esm.exception.NotAddException;
 import com.epam.esm.exception.NotFoundException;
-import com.epam.esm.exception.exception_code.ExceptionWithCode;
 import com.epam.esm.model_mapper.TagMapper;
 import com.epam.esm.repositoty.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.epam.esm.exception.exception_code.ExceptionWithCode.*;
 
 @Service
 public class TagServiceImpl implements TagService {
-    private static final TagServiceImpl instance = new TagServiceImpl();
+    private final TagRepositoryImpl tagRepository;
+    private final TagMapper tagMapper;
+    private final TagValidator tagValidator;
 
-    private TagServiceImpl() {
+    @Autowired
+    public TagServiceImpl(TagRepositoryImpl tagRepository, TagMapper tagMapper, TagValidator tagValidator) {
+        this.tagRepository = tagRepository;
+        this.tagMapper = tagMapper;
+        this.tagValidator = tagValidator;
     }
-
-    public static TagServiceImpl getInstance() {
-        return instance;
-    }
-
-    TagValidator tagValidator = TagValidator.getInstance();
-    TagRepositoryImpl tagRepository = TagRepositoryImpl.getInstance();
-    TagMapper tagMapper = new TagMapper();
 
     @Override
-    public List<TagDTO> getTags() throws NotFoundException {
+    public List<TagDTO> getTags() {
         List<Tag> allTags = tagRepository.getAll();
-        List<TagDTO> allTagDTOs = new ArrayList<>();
         if (allTags != null) {
-            for (Tag tag : allTags) {
-                allTagDTOs.add(tagMapper.convertToDTO(tag));
-            }
-            return allTagDTOs;
+            return allTags.stream().map(tagMapper::convertToDTO).collect(Collectors.toList());
         }
-        throw new NotFoundException(ExceptionWithCode.NOT_FOUND_TAGS.toString());
+        throw new NotFoundException(NOT_FOUND_TAGS.getId(), NOT_FOUND_TAGS.name());
     }
 
     @Override
-    public TagDTO getTagById(long id) throws NotFoundException, InvalidIdException {
+    public TagDTO getTagById(long id) {
         tagValidator.checkTagDTOId(id);
         Tag tag = tagRepository.getById(id);
         if (tag == null) {
-            throw new NotFoundException(ExceptionWithCode.TAG_WITH_ID_NOT_FOUND.toString());
+            throw new NotFoundException(TAG_WITH_ID_NOT_FOUND.getId(), TAG_WITH_ID_NOT_FOUND.name());
         }
         return tagMapper.convertToDTO(tag);
     }
 
     @Override
-    public TagDTO getTagByName(String name) throws NotFoundException, InvalidNameException {
+    public TagDTO getTagByName(String name) {
         tagValidator.checkTagDTOName(name);
         Tag tag = tagRepository.getByName(name);
         if (tag == null) {
-            throw new NotFoundException(ExceptionWithCode.TAG_WITH_ID_NOT_FOUND.toString());
+            throw new NotFoundException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
         }
         return tagMapper.convertToDTO(tag);
     }
 
     @Override
-    public TagDTO addTag(TagDTO tagDTO) throws InvalidNameException {
+    public TagDTO addTag(TagDTO tagDTO) {
         tagValidator.checkTagDTOName(tagDTO.getName());
-        Tag addedTag = tagRepository.add(tagMapper.convertToEntity(tagDTO));
-        return tagMapper.convertToDTO(addedTag);
+        if (tagRepository.getByName(tagDTO.getName()) != null) {
+            throw new NotAddException(NOT_ADD_TAG.getId(), NOT_ADD_TAG.name());
+        }
+        return tagMapper.convertToDTO(tagRepository.add(tagMapper.convertToEntity(tagDTO)));
     }
 
     @Override
-    public boolean deleteTagById(long id) throws NotFoundException, InvalidIdException {
-        Tag tag = tagMapper.convertToEntity(getTagById(id));
-        return tagRepository.delete(tag.getId());
+    public boolean deleteTagById(long id) {
+        tagValidator.checkTagDTOId(id);
+        if (tagRepository.getById(id) != null) {
+            return tagRepository.delete(id);
+        }
+        throw new NotFoundException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
+    }
+
+    @Override
+    public List<Tag> getTagsByCertificateId(long id) {
+        List<Long> certificateTagsIds = tagRepository.getTagsIdsByCertificateId(id);
+        return certificateTagsIds.stream().map(tagRepository::getById).collect(Collectors.toList());
     }
 
 }

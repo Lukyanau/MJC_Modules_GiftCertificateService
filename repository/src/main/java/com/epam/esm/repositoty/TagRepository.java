@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface TagRepository extends BaseRepository<Tag>{
-    List<Tag> getTagsByCertificateName(String certificateName);
+    List<Long> getTagsIdsByCertificateId(long id);
 }
