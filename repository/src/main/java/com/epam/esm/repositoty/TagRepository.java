@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface TagRepository extends BaseRepository<Tag>{
     List<Long> getTagsIdsByCertificateId(long id);
+    Long getTagId(String tagName);
 }

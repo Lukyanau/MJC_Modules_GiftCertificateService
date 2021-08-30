@@ -2,8 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.TagDTO;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.NotAddException;
-import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.ServiceException;
 import com.epam.esm.model_mapper.TagMapper;
 import com.epam.esm.repositoty.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
@@ -18,6 +17,7 @@ import static com.epam.esm.exception.exception_code.ExceptionWithCode.*;
 
 @Service
 public class TagServiceImpl implements TagService {
+
     private final TagRepositoryImpl tagRepository;
     private final TagMapper tagMapper;
     private final TagValidator tagValidator;
@@ -35,7 +35,7 @@ public class TagServiceImpl implements TagService {
         if (allTags != null) {
             return allTags.stream().map(tagMapper::convertToDTO).collect(Collectors.toList());
         }
-        throw new NotFoundException(NOT_FOUND_TAGS.getId(), NOT_FOUND_TAGS.name());
+        throw new ServiceException(NOT_FOUND_TAGS.getId(), NOT_FOUND_TAGS.name());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TagServiceImpl implements TagService {
         tagValidator.checkTagDTOId(id);
         Tag tag = tagRepository.getById(id);
         if (tag == null) {
-            throw new NotFoundException(TAG_WITH_ID_NOT_FOUND.getId(), TAG_WITH_ID_NOT_FOUND.name());
+            throw new ServiceException(TAG_WITH_ID_NOT_FOUND.getId(), TAG_WITH_ID_NOT_FOUND.name());
         }
         return tagMapper.convertToDTO(tag);
     }
@@ -53,7 +53,7 @@ public class TagServiceImpl implements TagService {
         tagValidator.checkTagDTOName(name);
         Tag tag = tagRepository.getByName(name);
         if (tag == null) {
-            throw new NotFoundException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
+            throw new ServiceException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
         }
         return tagMapper.convertToDTO(tag);
     }
@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService {
     public TagDTO addTag(TagDTO tagDTO) {
         tagValidator.checkTagDTOName(tagDTO.getName());
         if (tagRepository.getByName(tagDTO.getName()) != null) {
-            throw new NotAddException(NOT_ADD_TAG.getId(), NOT_ADD_TAG.name());
+            throw new ServiceException(NOT_ADD_TAG.getId(), NOT_ADD_TAG.name());
         }
         return tagMapper.convertToDTO(tagRepository.add(tagMapper.convertToEntity(tagDTO)));
     }
@@ -73,7 +73,7 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.getById(id) != null) {
             return tagRepository.delete(id);
         }
-        throw new NotFoundException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
+        throw new ServiceException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
     }
 
     @Override

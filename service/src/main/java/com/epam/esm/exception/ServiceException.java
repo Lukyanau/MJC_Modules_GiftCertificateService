@@ -3,28 +3,28 @@ package com.epam.esm.exception;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NotFoundException extends RuntimeException {
+public class ServiceException extends RuntimeException {
     private String errorCode;
     private String message;
 
-    public NotFoundException() {
+    public ServiceException() {
     }
 
-    public NotFoundException(String errorCode, String message) {
+    public ServiceException(String errorCode, String message) {
         super();
         this.errorCode = errorCode;
         this.message = message;
     }
 
-    public NotFoundException(String message) {
+    public ServiceException(String message) {
         super(message);
     }
 
-    public NotFoundException(String message, Throwable cause) {
+    public ServiceException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NotFoundException(Throwable cause) {
+    public ServiceException(Throwable cause) {
         super(cause);
     }
 
@@ -35,5 +35,11 @@ public class NotFoundException extends RuntimeException {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return "errorCode='" + errorCode + '\n' +
+                "message='" + message;
     }
 }

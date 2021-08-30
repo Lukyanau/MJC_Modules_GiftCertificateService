@@ -6,9 +6,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CertificateRepository extends BaseRepository<GiftCertificate>{
+public interface CertificateRepository extends BaseRepository<GiftCertificate> {
+    void addCertificateAndTagIds(long certificateId, long tagId);
     GiftCertificate updateCertificate(GiftCertificate giftCertificate);
-    List<GiftCertificate> getCertificatesByTag(String tagName);
-    List<GiftCertificate> getCertificatesByPartOfName(String partOfName);
-    List<GiftCertificate> getCertificatesByPartOfDescription(String partOfDescription);
+    Long getCertificateId(String name);
 }

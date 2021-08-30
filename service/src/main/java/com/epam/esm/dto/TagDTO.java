@@ -2,6 +2,9 @@ package com.epam.esm.dto;
 
 public class TagDTO {
 
+    private long id;
+    private String name;
+
     public TagDTO() {
     }
 
@@ -13,9 +16,6 @@ public class TagDTO {
         this.id = id;
         this.name = name;
     }
-
-    private long id;
-    private String name;
 
     public long getId() {
         return id;

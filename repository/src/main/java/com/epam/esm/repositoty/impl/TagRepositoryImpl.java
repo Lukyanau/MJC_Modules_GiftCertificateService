@@ -1,6 +1,6 @@
 package com.epam.esm.repositoty.impl;
 
-import com.epam.esm.dao.SqlQuery;
+import com.epam.esm.repositoty.SqlQuery;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repositoty.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,12 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
+    public Long getTagId(String tagName) {
+        return jdbcTemplate.query(SqlQuery.GET_TAG_ID, new BeanPropertyRowMapper<>(Long.class), tagName)
+                .stream().findAny().orElse( null);
+    }
+
+    @Override
     public List<Tag> getAll() {
         return jdbcTemplate.query(SqlQuery.GET_ALL_TAGS, new BeanPropertyRowMapper<>(Tag.class));
     }
@@ -48,7 +54,6 @@ public class TagRepositoryImpl implements TagRepository {
         return jdbcTemplate.query(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID,
                 new BeanPropertyRowMapper<>(Long.class), id);
     }
-
 
     @Override
     public boolean delete(long id) {

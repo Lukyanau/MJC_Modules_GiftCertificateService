@@ -1,7 +1,5 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.Tag;
-
 import java.math.BigDecimal;
 import java.util.List;
 

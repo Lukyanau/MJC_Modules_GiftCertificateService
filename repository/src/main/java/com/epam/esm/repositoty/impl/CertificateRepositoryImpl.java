@@ -1,8 +1,7 @@
 package com.epam.esm.repositoty.impl;
 
-import com.epam.esm.dao.SqlQuery;
+import com.epam.esm.repositoty.SqlQuery;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.repositoty.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -23,18 +22,10 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public GiftCertificate add(GiftCertificate giftCertificate) {
-//        GiftCertificate addedCertificate = certificateDao.add(giftCertificate);
-//        addedCertificate.setId(certificateDao.getByName(addedCertificate.getName()).getId());
-//        for (Tag tag : addedCertificate.getCertificateTags()) {
-//            if (tagDao.getByName(tag.getName()) != null) {
-//                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tag.getId());
-//            } else {
-//                tagDao.add(tag);
-//                certificateDao.addCertificateAndTagIds(addedCertificate.getId(), tagDao.getByName(tag.getName()).getId());
-//            }
-//        }
-//        return addedCertificate;
-        return null;
+        jdbcTemplate.update(SqlQuery.ADD_CERTIFICATE, giftCertificate.getName(), giftCertificate.getDescription(),
+                giftCertificate.getPrice(), giftCertificate.getDuration(), giftCertificate.getCreated(),
+                giftCertificate.getUpdated());
+        return giftCertificate;
     }
 
     @Override
@@ -55,27 +46,24 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
+    public Long getCertificateId(String name) {
+        return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_ID, new BeanPropertyRowMapper<>(Long.class), name)
+                .stream().findAny().orElse(null);
+    }
+
+    @Override
     public boolean delete(long id) {
-        return false;
+        return jdbcTemplate.update(SqlQuery.DELETE_CERTIFICATE_BY_ID, id) > 0;
+    }
+
+
+    @Override
+    public void addCertificateAndTagIds(long certificateId, long tagId) {
+        jdbcTemplate.update(SqlQuery.ADD_CERTIFICATE_AND_TAG_IDS, certificateId, tagId);
     }
 
     @Override
     public GiftCertificate updateCertificate(GiftCertificate giftCertificate) {
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificate> getCertificatesByTag(String tagName) {
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificate> getCertificatesByPartOfName(String partOfName) {
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificate> getCertificatesByPartOfDescription(String partOfDescription) {
         return null;
     }
 }

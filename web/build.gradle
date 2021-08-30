@@ -2,27 +2,16 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    implementation project(':service')
     implementation group: 'org.springframework', name: 'spring-core', version: '5.3.8'
-    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.8'
     implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.8'
     implementation group: 'org.springframework', name: 'spring-context', version: '5.3.8'
-    implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.8'
-    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-
-
-}
-
-test {
-    useJUnitPlatform()
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.3'
+    implementation project(':service')
 }

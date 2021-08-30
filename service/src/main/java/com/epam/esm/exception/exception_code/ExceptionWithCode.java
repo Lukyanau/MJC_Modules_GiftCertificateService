@@ -5,11 +5,16 @@ public enum ExceptionWithCode {
 
     INVALID_CERTIFICATE_ID("001", "Invalid certificate id. Should be from 1 and more"),
     CERTIFICATE_WITH_ID_NOT_FOUND("002", "Certificate with this id not found"),
-    INCORRECT_INPUT_PARAMETERS("003", "Incorrect input parameters"),
-    NOT_FOUND_CERTIFICATES("004","No certificates found"),
-    INVALID_CERTIFICATE_NAME("005","Invalid certificate name."),
-    CERTIFICATE_WITH_NAME_NOT_FOUND("006","Certificate with this name not found."),
-    NOT_ADD_CERTIFICATE("007","Certificate with this name already exists."),
+    NOT_FOUND_CERTIFICATES("003","No certificates found"),
+    INVALID_CERTIFICATE_NAME("004","Invalid certificate name."),
+    INVALID_CERTIFICATE_DESCRIPTION("005","Invalid certificate description."),
+    INVALID_CERTIFICATE_PRICE("006","Invalid certificate price."),
+    WRONG_CERTIFICATE_PRICE_RANGE("007","Wrong certificate price range. Should be from 1 to 1000"),
+    INVALID_CERTIFICATE_DURATION("008","Invalid certificate duration"),
+    WRONG_CERTIFICATE_DURATION_RANGE("009","Wrong certificate duration. Should be from 30 to 180"),
+    CERTIFICATE_WITH_NAME_NOT_FOUND("010","Certificate with this name not found."),
+    NOT_ADD_CERTIFICATE("011","Certificate with this name already exists."),
+    NOT_UPDATE_CERTIFICATE("012","No certificate with this id."),
 
     //Tag codes 101-200
 
