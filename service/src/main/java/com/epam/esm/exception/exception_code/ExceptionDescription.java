@@ -1,6 +1,6 @@
 package com.epam.esm.exception.exception_code;
 
-public enum ExceptionWithCode {
+public enum ExceptionDescription {
     //Certificate codes 1-100
 
     INVALID_CERTIFICATE_ID("001", "Invalid certificate id. Should be from 1 and more"),
@@ -15,6 +15,7 @@ public enum ExceptionWithCode {
     CERTIFICATE_WITH_NAME_NOT_FOUND("010","Certificate with this name not found."),
     NOT_ADD_CERTIFICATE("011","Certificate with this name already exists."),
     NOT_UPDATE_CERTIFICATE("012","No certificate with this id."),
+    NO_SEARCH_PARAMETERS_FOR_CERTIFICATE("013","No search parameters for certificate."),
 
     //Tag codes 101-200
 
@@ -29,7 +30,7 @@ public enum ExceptionWithCode {
     private final String id;
     private final String message;
 
-    ExceptionWithCode(String id, String message) {
+    ExceptionDescription(String id, String message) {
         this.id = id;
         this.message = message;
     }

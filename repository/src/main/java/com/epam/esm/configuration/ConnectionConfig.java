@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Objects;
 
 @Configuration
 @ComponentScan("com.epam.esm")
@@ -31,6 +35,11 @@ public class ConnectionConfig {
     @Bean
     public JdbcTemplate jdbcTemplate(){
         return new JdbcTemplate(hikari());
+    }
+
+    @Bean
+    public PlatformTransactionManager txManager(){
+        return new DataSourceTransactionManager(Objects.requireNonNull(jdbcTemplate().getDataSource()));
     }
 
 }

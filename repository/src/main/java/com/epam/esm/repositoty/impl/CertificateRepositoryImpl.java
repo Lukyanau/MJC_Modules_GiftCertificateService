@@ -47,8 +47,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public Long getCertificateId(String name) {
-        return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_ID, new BeanPropertyRowMapper<>(Long.class), name)
-                .stream().findAny().orElse(null);
+        return jdbcTemplate.queryForObject(SqlQuery.GET_CERTIFICATE_ID, Long.class, name);
     }
 
     @Override
@@ -64,6 +63,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public GiftCertificate updateCertificate(GiftCertificate giftCertificate) {
-        return null;
+        jdbcTemplate.update(SqlQuery.UPDATE_CERTIFICATE_BY_NAME, giftCertificate.getDescription(), giftCertificate.getPrice(),
+                giftCertificate.getDuration(), giftCertificate.getUpdated(), giftCertificate.getName());
+        return giftCertificate;
     }
 }

@@ -40,8 +40,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Long getTagId(String tagName) {
-        return jdbcTemplate.query(SqlQuery.GET_TAG_ID, new BeanPropertyRowMapper<>(Long.class), tagName)
-                .stream().findAny().orElse( null);
+        return jdbcTemplate.queryForObject(SqlQuery.GET_TAG_ID, Long.class, tagName);
     }
 
     @Override
@@ -51,8 +50,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<Long> getTagsIdsByCertificateId(long id) {
-        return jdbcTemplate.query(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID,
-                new BeanPropertyRowMapper<>(Long.class), id);
+        return jdbcTemplate.queryForList(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID, Long.class, id);
     }
 
     @Override

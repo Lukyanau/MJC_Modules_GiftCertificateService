@@ -1,5 +1,6 @@
 package com.epam.esm.exception;
 
+import com.epam.esm.exception.exception_code.ExceptionDescription;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,10 +11,10 @@ public class ServiceException extends RuntimeException {
     public ServiceException() {
     }
 
-    public ServiceException(String errorCode, String message) {
+    public ServiceException(ExceptionDescription exceptionDescription) {
         super();
-        this.errorCode = errorCode;
-        this.message = message;
+        this.errorCode = exceptionDescription.getId();
+        this.message = exceptionDescription.getMessage();
     }
 
     public ServiceException(String message) {

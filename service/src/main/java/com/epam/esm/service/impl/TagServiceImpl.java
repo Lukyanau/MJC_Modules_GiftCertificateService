@@ -3,7 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dto.TagDTO;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.model_mapper.TagMapper;
+import com.epam.esm.mapper.TagMapper;
 import com.epam.esm.repositoty.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.epam.esm.exception.exception_code.ExceptionWithCode.*;
+import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -35,7 +35,7 @@ public class TagServiceImpl implements TagService {
         if (allTags != null) {
             return allTags.stream().map(tagMapper::convertToDTO).collect(Collectors.toList());
         }
-        throw new ServiceException(NOT_FOUND_TAGS.getId(), NOT_FOUND_TAGS.name());
+        throw new ServiceException(NOT_FOUND_TAGS);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TagServiceImpl implements TagService {
         tagValidator.checkTagDTOId(id);
         Tag tag = tagRepository.getById(id);
         if (tag == null) {
-            throw new ServiceException(TAG_WITH_ID_NOT_FOUND.getId(), TAG_WITH_ID_NOT_FOUND.name());
+            throw new ServiceException(TAG_WITH_ID_NOT_FOUND);
         }
         return tagMapper.convertToDTO(tag);
     }
@@ -53,7 +53,7 @@ public class TagServiceImpl implements TagService {
         tagValidator.checkTagDTOName(name);
         Tag tag = tagRepository.getByName(name);
         if (tag == null) {
-            throw new ServiceException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
+            throw new ServiceException(TAG_WITH_NAME_NOT_FOUND);
         }
         return tagMapper.convertToDTO(tag);
     }
@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService {
     public TagDTO addTag(TagDTO tagDTO) {
         tagValidator.checkTagDTOName(tagDTO.getName());
         if (tagRepository.getByName(tagDTO.getName()) != null) {
-            throw new ServiceException(NOT_ADD_TAG.getId(), NOT_ADD_TAG.name());
+            throw new ServiceException(NOT_ADD_TAG);
         }
         return tagMapper.convertToDTO(tagRepository.add(tagMapper.convertToEntity(tagDTO)));
     }
@@ -73,12 +73,15 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.getById(id) != null) {
             return tagRepository.delete(id);
         }
-        throw new ServiceException(TAG_WITH_NAME_NOT_FOUND.getId(), TAG_WITH_NAME_NOT_FOUND.name());
+        throw new ServiceException(TAG_WITH_NAME_NOT_FOUND);
     }
 
     @Override
     public List<Tag> getTagsByCertificateId(long id) {
         List<Long> certificateTagsIds = tagRepository.getTagsIdsByCertificateId(id);
+        if (certificateTagsIds == null) {
+            return null;
+        }
         return certificateTagsIds.stream().map(tagRepository::getById).collect(Collectors.toList());
     }
 

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.epam.esm.exception.exception_code.ExceptionWithCode.*;
+import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
 @Component
 public class CertificateValidator {
@@ -19,7 +19,7 @@ public class CertificateValidator {
     private static final String PRICE_REGEX = "^\\d+\\.?\\d+$";
     private static final String ID_REGEX = "^[0-9]+$";
     private static final String DURATION_REGEX = ID_REGEX;
-    private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{1,30})+$";
+    private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{3,30})+$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDTO(RequestCertificateDTO certificateDTO) {
@@ -31,40 +31,40 @@ public class CertificateValidator {
 
     public void checkCertificateDTOId(long id) {
         if (!isNotEmptyOrNull(String.valueOf(id)) || !String.valueOf(id).matches(ID_REGEX) || id < MIN_CERTIFICATE_ID) {
-            throw new ServiceException(INVALID_CERTIFICATE_ID.getId(), INVALID_CERTIFICATE_ID.name());
+            throw new ServiceException(INVALID_CERTIFICATE_ID);
         }
     }
 
     public void checkCertificateDTOName(String name) {
         if (!isNotEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_NAME.getId(), INVALID_CERTIFICATE_NAME.name());
+            throw new ServiceException(INVALID_CERTIFICATE_NAME);
         }
     }
 
     public void checkCertificateDTODescription(String description) {
         if (!isNotEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION.getId(), INVALID_CERTIFICATE_DESCRIPTION.name());
+            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
         }
     }
 
     public void checkCertificateDTOPrice(BigDecimal price) {
         String strPrice = String.valueOf(price);
         if (!isNotEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_PRICE.getId(), INVALID_CERTIFICATE_PRICE.name());
+            throw new ServiceException(INVALID_CERTIFICATE_PRICE);
         }
         int certificatePrice = price.intValue();
         if (!(MIN_CERTIFICATE_PRICE <= certificatePrice && certificatePrice <= MAX_CERTIFICATE_PRICE)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION.getId(), INVALID_CERTIFICATE_DESCRIPTION.name());
+            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
         }
     }
 
     public void checkCertificateDTODuration(int duration) {
         String strDuration = String.valueOf(duration);
-        if (isNotEmptyOrNull(strDuration) && strDuration.matches(DURATION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DURATION.getId(), INVALID_CERTIFICATE_DURATION.name());
+        if (!isNotEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_DURATION);
         }
         if (!(duration > MIN_CERTIFICATE_DURATION && duration < MAX_CERTIFICATE_DURATION)) {
-            throw new ServiceException(WRONG_CERTIFICATE_DURATION_RANGE.getId(), WRONG_CERTIFICATE_DURATION_RANGE.name());
+            throw new ServiceException(WRONG_CERTIFICATE_DURATION_RANGE);
         }
     }
 

@@ -20,6 +20,7 @@ public class MyWebApplicationInitializerConfig implements WebApplicationInitiali
         ServletRegistration.Dynamic dispatcher =
                 servletContext.addServlet("DispatcherServlet", new DispatcherServlet(applicationContext));
         dispatcher.addMapping("/");
+        dispatcher.setInitParameter("throwExceptionIfNoHandlerFound","true");
         dispatcher.setLoadOnStartup(1);
     }
 }

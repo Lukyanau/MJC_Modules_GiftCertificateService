@@ -4,15 +4,13 @@ import com.epam.esm.dto.RequestCertificateDTO;
 import com.epam.esm.dto.ResponseCertificateDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CertificateService {
     List<ResponseCertificateDTO> getCertificates();
     ResponseCertificateDTO getCertificateById(long id);
-    ResponseCertificateDTO getCertificateByName(String name);
+    List<ResponseCertificateDTO> getCertificatesByParams(Map<String,String> searchParams);
     ResponseCertificateDTO addCertificate(RequestCertificateDTO certificateDTO);
     ResponseCertificateDTO updateCertificate(RequestCertificateDTO certificateDTO);
     boolean deleteCertificateById(long id);
-    List<ResponseCertificateDTO> getCertificatesByTag(String tagName);
-    List<ResponseCertificateDTO> getCertificatesByPartOfName(String partOfName);
-    List<ResponseCertificateDTO> getCertificatesByPartOfDescription(String partOfDescription);
 }

@@ -9,6 +9,8 @@ public class SqlQuery {
     public static final String GET_CERTIFICATE_BY_ID = "SELECT * FROM gift_certificate WHERE id = ?";
     public static final String GET_CERTIFICATE_BY_NAME = "SELECT * FROM gift_certificate WHERE name = ?";
     public static final String DELETE_CERTIFICATE_BY_ID = "DELETE FROM gift_certificate WHERE id = ?";
+    public static final String UPDATE_CERTIFICATE_BY_NAME = "UPDATE gift_certificate SET description = ?, price = ?," +
+            " duration = ?, updated = ? WHERE name = ?";
 
     //Cross table
     public static final String ADD_CERTIFICATE_AND_TAG_IDS = "INSERT INTO gift_tag(gift_id, tag_id) VALUES(?,?)";

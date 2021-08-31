@@ -2,66 +2,58 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.RequestCertificateDTO;
 import com.epam.esm.dto.ResponseCertificateDTO;
-import com.epam.esm.service.impl.CertificateServiceImpl;
+import com.epam.esm.service.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("certificates")
 public class CertificateController {
 
-    private final CertificateServiceImpl certificateService;
+    private final CertificateService certificateService;
 
     @Autowired
-    public CertificateController(CertificateServiceImpl certificateService) {
+    public CertificateController(CertificateService certificateService) {
         this.certificateService = certificateService;
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<ResponseCertificateDTO> getCertificates(){
         return certificateService.getCertificates();
     }
 
-    @GetMapping(value = "/id")
-    public ResponseCertificateDTO getCertificateById(@RequestParam("id") long id) {
+    @GetMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseCertificateDTO getCertificateById(@PathVariable("id") long id) {
         return certificateService.getCertificateById(id);
     }
 
-    @GetMapping(value = "/name")
-    public ResponseCertificateDTO getCertificateByName(@RequestParam("name") String name) {
-        return certificateService.getCertificateByName(name);
-    }
-
-    @GetMapping(value = "/tagName")
-    public List<ResponseCertificateDTO> getCertificatesByTag(@RequestParam("tagName") String tagName) {
-        return certificateService.getCertificatesByTag(tagName);
-    }
-
-    @GetMapping(value = "/partOfName")
-    public List<ResponseCertificateDTO> getCertificatesByPartOfName(@RequestParam("partOfName") String partOfName) {
-        return certificateService.getCertificatesByPartOfName(partOfName);
-    }
-
-    @GetMapping(value = "/partOfDescription")
-    public List<ResponseCertificateDTO> getCertificatesByPartOfDescription
-            (@RequestParam("partOfDescription") String partOfDescription) {
-        return certificateService.getCertificatesByPartOfDescription(partOfDescription);
+    @GetMapping(value = "/parameters")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ResponseCertificateDTO> getCertificatesByParams(@RequestParam Map<String, String> searchParams) {
+        return certificateService.getCertificatesByParams(searchParams);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.OK)
     public ResponseCertificateDTO addCertificate(@RequestBody RequestCertificateDTO certificateDTO) {
         return certificateService.addCertificate(certificateDTO);
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
     public ResponseCertificateDTO updateCertificate(@RequestBody RequestCertificateDTO certificateDTO){
         return certificateService.updateCertificate(certificateDTO);
     }
 
-    @DeleteMapping
-    public boolean deleteCertificateById(@RequestParam("id") long id){
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean deleteCertificateById(@PathVariable("id") long id){
         return certificateService.deleteCertificateById(id);
     }
 }
