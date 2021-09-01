@@ -1,18 +1,18 @@
 package com.epam.esm.dto;
 
-public class TagDTO {
+public class TagDto {
 
     private long id;
     private String name;
 
-    public TagDTO() {
+    public TagDto() {
     }
 
-    public TagDTO(String name) {
+    public TagDto(String name) {
         this.name = name;
     }
 
-    public TagDTO(long id, String name) {
+    public TagDto(long id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -2,16 +2,13 @@ plugins {
     id 'java'
 }
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.8'
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.8'
-    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.8'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: "${springVersion}"
+    implementation 'org.modelmapper:modelmapper:2.3.8'
     implementation project(':repository')
 }
 

@@ -1,23 +1,26 @@
 package com.epam.esm.mapper;
 
-import com.epam.esm.dto.TagDTO;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TagMapper {
 
-    public Tag convertToEntity(TagDTO tagDTO) {
-        Tag tag = new Tag();
-        tag.setId(tagDTO.getId());
-        tag.setName(tagDTO.getName());
-        return tag;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public TagMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
-    public TagDTO convertToDTO(Tag tag) {
-        TagDTO tagDTO = new TagDTO();
-        tagDTO.setId(tag.getId());
-        tagDTO.setName(tag.getName());
-        return tagDTO;
+    public Tag convertToEntity(TagDto tagDto) {
+        return modelMapper.map(tagDto, Tag.class);
+    }
+
+    public TagDto convertToDto(Tag tag) {
+        return modelMapper.map(tag, TagDto.class);
     }
 }

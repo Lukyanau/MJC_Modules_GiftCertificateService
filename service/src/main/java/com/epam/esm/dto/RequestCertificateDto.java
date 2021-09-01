@@ -3,13 +3,13 @@ package com.epam.esm.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class RequestCertificateDTO {
+public class RequestCertificateDto {
     private long id;
     private String name;
     private String description;
     private BigDecimal price;
     private int duration;
-    private List<TagDTO> certificateTags;
+    private List<TagDto> tags;
 
     public long getId() {
         return id;
@@ -51,11 +51,11 @@ public class RequestCertificateDTO {
         this.duration = duration;
     }
 
-    public List<TagDTO> getCertificateTags() {
-        return certificateTags;
+    public List<TagDto> getCertificateTags() {
+        return tags;
     }
 
-    public void setCertificateTags(List<TagDTO> certificateTags) {
-        this.certificateTags = certificateTags;
+    public void setCertificateTags(List<TagDto> certificateTags) {
+        this.tags = certificateTags;
     }
 }

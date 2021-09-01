@@ -5,11 +5,17 @@ plugins {
 group 'com.epam.esm'
 version '1.0'
 
-
 allprojects {
     apply plugin: 'java'
+    ext {
+        springVersion = '5.3.8'
+    }
     repositories {
         mavenCentral()
+    }
+    dependencies {
+        implementation "org.springframework:spring-core:${springVersion}"
+        implementation "org.springframework:spring-context:${springVersion}"
     }
 }
 

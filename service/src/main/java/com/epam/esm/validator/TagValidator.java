@@ -13,13 +13,13 @@ public class TagValidator {
     private static final String ID_REGEX = "^[0-9]+$";
     private static final String NAME_REGEX = "^(#[a-zA-Z0-9]{3,20})$";
 
-    public void checkTagDTOId(long id) {
+    public void checkTagDtoId(long id) {
         if (!isNotEmptyOrNull(String.valueOf(id)) || !String.valueOf(id).matches(ID_REGEX) || id < MIN_TAG_ID) {
             throw new ServiceException(INVALID_TAG_ID);
         }
     }
 
-    public void checkTagDTOName(String name) {
+    public void checkTagDtoName(String name) {
         if (!isNotEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
             throw new ServiceException(INVALID_TAG_NAME);
         }

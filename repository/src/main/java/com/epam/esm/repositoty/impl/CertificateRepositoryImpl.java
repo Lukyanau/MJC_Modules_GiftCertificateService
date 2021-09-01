@@ -46,8 +46,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
-    public Long getCertificateId(String name) {
-        return jdbcTemplate.queryForObject(SqlQuery.GET_CERTIFICATE_ID, Long.class, name);
+    public Long getCertificateIdByName(String certificateName) {
+        return jdbcTemplate.queryForObject(SqlQuery.GET_CERTIFICATE_ID, Long.class, certificateName);
     }
 
     @Override

@@ -9,5 +9,7 @@ import java.util.List;
 public interface CertificateRepository extends BaseRepository<GiftCertificate> {
     void addCertificateAndTagIds(long certificateId, long tagId);
     GiftCertificate updateCertificate(GiftCertificate giftCertificate);
-    Long getCertificateId(String name);
+    GiftCertificate getByName(String certificateName);
+    Long getCertificateIdByName(String certificateName);
+
 }

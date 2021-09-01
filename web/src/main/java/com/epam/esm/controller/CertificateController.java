@@ -1,7 +1,7 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.RequestCertificateDTO;
-import com.epam.esm.dto.ResponseCertificateDTO;
+import com.epam.esm.dto.RequestCertificateDto;
+import com.epam.esm.dto.ResponseCertificateDto;
 import com.epam.esm.service.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,32 +23,32 @@ public class CertificateController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ResponseCertificateDTO> getCertificates(){
+    public List<ResponseCertificateDto> getCertificates(){
         return certificateService.getCertificates();
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseCertificateDTO getCertificateById(@PathVariable("id") long id) {
+    public ResponseCertificateDto getCertificateById(@PathVariable("id") long id) {
         return certificateService.getCertificateById(id);
     }
 
     @GetMapping(value = "/parameters")
     @ResponseStatus(HttpStatus.OK)
-    public List<ResponseCertificateDTO> getCertificatesByParams(@RequestParam Map<String, String> searchParams) {
+    public List<ResponseCertificateDto> getCertificatesByParams(@RequestParam Map<String, String> searchParams) {
         return certificateService.getCertificatesByParams(searchParams);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseCertificateDTO addCertificate(@RequestBody RequestCertificateDTO certificateDTO) {
-        return certificateService.addCertificate(certificateDTO);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseCertificateDto addCertificate(@RequestBody RequestCertificateDto certificateDto) {
+        return certificateService.addCertificate(certificateDto);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseCertificateDTO updateCertificate(@RequestBody RequestCertificateDTO certificateDTO){
-        return certificateService.updateCertificate(certificateDTO);
+    public ResponseCertificateDto updateCertificate(@RequestBody RequestCertificateDto certificateDto){
+        return certificateService.updateCertificate(certificateDto);
     }
 
     @DeleteMapping(value = "/{id}")

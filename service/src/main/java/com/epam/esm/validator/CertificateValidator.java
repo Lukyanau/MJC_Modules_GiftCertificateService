@@ -1,6 +1,6 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.dto.RequestCertificateDTO;
+import com.epam.esm.dto.RequestCertificateDto;
 import com.epam.esm.exception.ServiceException;
 import org.springframework.stereotype.Component;
 
@@ -22,32 +22,32 @@ public class CertificateValidator {
     private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{3,30})+$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
-    public void validateCertificateDTO(RequestCertificateDTO certificateDTO) {
-        checkCertificateDTOName(certificateDTO.getName());
-        checkCertificateDTODescription(certificateDTO.getDescription());
-        checkCertificateDTOPrice(certificateDTO.getPrice());
-        checkCertificateDTODuration(certificateDTO.getDuration());
+    public void validateCertificateDto(RequestCertificateDto certificateDto) {
+        checkCertificateDtoName(certificateDto.getName());
+        checkCertificateDtoDescription(certificateDto.getDescription());
+        checkCertificateDtoPrice(certificateDto.getPrice());
+        checkCertificateDtoDuration(certificateDto.getDuration());
     }
 
-    public void checkCertificateDTOId(long id) {
+    public void checkCertificateDtoId(long id) {
         if (!isNotEmptyOrNull(String.valueOf(id)) || !String.valueOf(id).matches(ID_REGEX) || id < MIN_CERTIFICATE_ID) {
             throw new ServiceException(INVALID_CERTIFICATE_ID);
         }
     }
 
-    public void checkCertificateDTOName(String name) {
+    public void checkCertificateDtoName(String name) {
         if (!isNotEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
             throw new ServiceException(INVALID_CERTIFICATE_NAME);
         }
     }
 
-    public void checkCertificateDTODescription(String description) {
+    public void checkCertificateDtoDescription(String description) {
         if (!isNotEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
             throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
         }
     }
 
-    public void checkCertificateDTOPrice(BigDecimal price) {
+    public void checkCertificateDtoPrice(BigDecimal price) {
         String strPrice = String.valueOf(price);
         if (!isNotEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
             throw new ServiceException(INVALID_CERTIFICATE_PRICE);
@@ -58,7 +58,7 @@ public class CertificateValidator {
         }
     }
 
-    public void checkCertificateDTODuration(int duration) {
+    public void checkCertificateDtoDuration(int duration) {
         String strDuration = String.valueOf(duration);
         if (!isNotEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX)) {
             throw new ServiceException(INVALID_CERTIFICATE_DURATION);
