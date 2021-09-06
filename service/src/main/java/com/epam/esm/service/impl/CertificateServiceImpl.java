@@ -117,7 +117,7 @@ public class CertificateServiceImpl implements CertificateService {
     /**
      * Transactional method for updating certificate
      *
-     * @param id is certificate id
+     * @param id             is certificate id
      * @param certificateDto is object from request
      * @return updated object
      */
@@ -130,42 +130,45 @@ public class CertificateServiceImpl implements CertificateService {
         if (foundedCertificate.isEmpty()) {
             throw new ServiceException(NOT_UPDATE_CERTIFICATE, String.valueOf(id));
         }
-        GiftCertificate preparedForUpdateCertificate = certificateMapper.convertToEntity(certificateDto);
-        preparedForUpdateCertificate.setId(foundedCertificate.get().getId());
-        preparedForUpdateCertificate.setCreated(foundedCertificate.get().getCreated());
-        preparedForUpdateCertificate.setUpdated(LocalDateTime.now());
-        if (preparedForUpdateCertificate.getCertificateTags() == null ||
-                preparedForUpdateCertificate.getCertificateTags().size() == 0) {
-            return certificateWithoutTagsUpdate(preparedForUpdateCertificate);
+        GiftCertificate preUpdatedCertificate = certificateMapper.convertToEntity(certificateDto);
+        preUpdatedCertificate.setId(foundedCertificate.get().getId());
+        preUpdatedCertificate.setCreated(foundedCertificate.get().getCreated());
+        preUpdatedCertificate.setUpdated(LocalDateTime.now());
+        if (preUpdatedCertificate.getCertificateTags() == null ||
+                preUpdatedCertificate.getCertificateTags().size() == 0) {
+            return certificateWithoutTagsUpdate(preUpdatedCertificate);
         }
-        return certificateWithTagsUpdate(preparedForUpdateCertificate);
+        return certificateWithTagsUpdate(preUpdatedCertificate);
     }
 
     /**
      * Method for partial updating certificate
      *
-     * @param id is certificate id
-     * @param fields is fields that should be updated
+     * @param id                    is certificate id
+     * @param preUpdatedCertificate is fields that should be updated
      * @return updated object
      */
     @Override
-    public ResponseCertificateDto patchUpdateCertificate(long id, Map<String, Object> fields) {
-        //validation
+    public ResponseCertificateDto patchUpdateCertificate(long id, RequestCertificateDto preUpdatedCertificate) {
+        certificateValidator.checkCertificateDtoId(id);
         Optional<GiftCertificate> giftCertificate = certificateRepository.getById(id);
         if (giftCertificate.isEmpty()) {
             throw new ServiceException(NOT_UPDATE_CERTIFICATE, String.valueOf(id));
         }
-        fields.forEach((k, v) -> {
-            //certificateValidator.validatePatchUpdateParams(k,v);
-            Field field = ReflectionUtils.findField(GiftCertificate.class, k);
-            Objects.requireNonNull(field).setAccessible(true);
-            ReflectionUtils.setField(field, giftCertificate.get(), v);
-        });
-        giftCertificate.get().setUpdated(LocalDateTime.now());
-        certificateRepository.updateCertificate(id, giftCertificate.get());
-        GiftCertificate updatedCertificate = certificateRepository.getById(id).get();
-        updatedCertificate.setCertificateTags(tagService.getTagsByCertificateId(id));
-        return certificateMapper.convertToDto(updatedCertificate);
+        preUpdatedCertificate.setId(id);
+
+        checkPatchUpdateObjectFields(preUpdatedCertificate, giftCertificate.get());
+        certificateValidator.validateCertificateDto(preUpdatedCertificate);
+        GiftCertificate checkedPreUpdatedCertificate = certificateMapper.convertToEntity(preUpdatedCertificate);
+        checkedPreUpdatedCertificate.setCreated(giftCertificate.get().getCreated());
+        checkedPreUpdatedCertificate.setUpdated(LocalDateTime.now());
+        if (checkedPreUpdatedCertificate.getCertificateTags() == null) {
+            checkedPreUpdatedCertificate.setCertificateTags(
+                    tagService.getTagsByCertificateId(checkedPreUpdatedCertificate.getId()));
+            certificateRepository.updateCertificate(id, checkedPreUpdatedCertificate);
+            return certificateMapper.convertToDto(checkedPreUpdatedCertificate);
+        }
+        return certificateWithTagsUpdate(checkedPreUpdatedCertificate);
     }
 
     /**
@@ -177,6 +180,9 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean deleteCertificateById(long id) {
         certificateValidator.checkCertificateDtoId(id);
+        if (!(certificateRepository.delete(id)>0)){
+            throw new ServiceException(NOT_DELETE_CERTIFICATE, String.valueOf(id));
+        }
         return certificateRepository.delete(id) > 0;
     }
 
@@ -190,12 +196,12 @@ public class CertificateServiceImpl implements CertificateService {
     private ResponseCertificateDto certificateWithTagsUpdate(GiftCertificate certificate) {
         certificate.getCertificateTags().forEach(s -> tagValidator.checkTagDtoName(s.getName()));
         certificateRepository.updateCertificate(certificate.getId(), certificate);
-        List<Tag> currentTags = tagService.getTagsByCertificateId(certificate.getId());
         certificate.getCertificateTags().forEach(t -> {
             if (tagRepository.getByName(t.getName()).isPresent()) {
                 t.setId(tagRepository.getTagId(t.getName()));
             }
         });
+        List<Tag> currentTags = tagService.getTagsByCertificateId(certificate.getId());
         currentTags.forEach(t -> {
             if (!certificate.getCertificateTags().contains(t)) {
                 tagService.deleteFromCrossTable(t.getId(), certificate.getId());
@@ -233,6 +239,21 @@ public class CertificateServiceImpl implements CertificateService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         addedCertificate.setCreated(currentDateTime);
         addedCertificate.setUpdated(currentDateTime);
+    }
+
+    private void checkPatchUpdateObjectFields(RequestCertificateDto preUpdatedCertificate, GiftCertificate giftCertificate) {
+        if (preUpdatedCertificate.getName() == null) {
+            preUpdatedCertificate.setName(giftCertificate.getName());
+        }
+        if (preUpdatedCertificate.getDescription() == null) {
+            preUpdatedCertificate.setDescription(giftCertificate.getDescription());
+        }
+        if (preUpdatedCertificate.getPrice() == null) {
+            preUpdatedCertificate.setPrice(giftCertificate.getPrice());
+        }
+        if (preUpdatedCertificate.getDuration() == 0) {
+            preUpdatedCertificate.setDuration(giftCertificate.getDuration());
+        }
     }
 
 }

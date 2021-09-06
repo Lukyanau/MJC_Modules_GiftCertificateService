@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -25,7 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler{
 
     private final ExceptionMessageTranslator translator;
 
@@ -59,7 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(NumberFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleNumberFormatException(IllegalArgumentException ex) {
+    public ApiError handleNumberFormatException(NumberFormatException ex) {
         LOGGER.error(ex.getLocalizedMessage());
         return new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "400");
     }
@@ -74,6 +75,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleIllegalArgumentException(IllegalArgumentException ex) {
+        LOGGER.error(ex.getLocalizedMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "400");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         LOGGER.error(ex.getLocalizedMessage());
         return new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "400");
     }

@@ -99,6 +99,9 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.checkUsedTags(id) > 0) {
             throw new ServiceException(TAG_USED_IN_SOME_CERTIFICATES, String.valueOf(id));
         }
+        if (!(tagRepository.delete(id)>0)){
+            throw new ServiceException(NOT_DELETE_TAG, String.valueOf(id));
+        }
         return tagRepository.delete(id) > 0;
     }
 

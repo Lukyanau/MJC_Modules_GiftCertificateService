@@ -29,6 +29,7 @@ public enum ExceptionDescription {
     INVALID_SORT_TYPE("CF-00017"),
     NO_SUCH_SEARCH_PARAMETER("CF-00018"),
     INVALID_SEARCH_PARAMETER_VALUE("CF-00019"),
+    NOT_DELETE_CERTIFICATE("CF-00020"),
 
     //Tag codes 101-200
 
@@ -38,7 +39,8 @@ public enum ExceptionDescription {
     INVALID_TAG_NAME("TG-00004"),
     NOT_FOUND_TAGS("TG-00005"),
     NOT_ADD_TAG("TG-00006"),
-    TAG_USED_IN_SOME_CERTIFICATES("TG-00007");
+    TAG_USED_IN_SOME_CERTIFICATES("TG-00007"),
+    NOT_DELETE_TAG("TG-00008");
 
 
     private final String errorCode;

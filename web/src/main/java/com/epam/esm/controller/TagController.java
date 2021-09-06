@@ -37,7 +37,6 @@ public class TagController {
      */
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    // check if string input
     public TagDto getTagById(@PathVariable("id") long id) {
         return tagService.getTagById(id);
     }
@@ -56,13 +55,13 @@ public class TagController {
     /**
      * method deletes tag
      * @param id is getting from url
-     * @return true or false
+     * @return String message
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    // check if string input
     //Maybe use NO_CONTENT
-    public boolean deleteTagById(@PathVariable("id") long id) {
-        return tagService.deleteTagById(id);
+    public String deleteTagById(@PathVariable("id") long id) {
+        tagService.deleteTagById(id);
+        return "Successfully deleted tag with id: " + id;
     }
 }

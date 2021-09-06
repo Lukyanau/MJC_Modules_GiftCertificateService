@@ -78,18 +78,20 @@ public class CertificateController {
     @PatchMapping({"/{id}"})
     @ResponseStatus(HttpStatus.OK)
     public ResponseCertificateDto patchUpdateCertificate(@PathVariable("id") long id,
-                                                         @RequestBody Map<String, Object> fields){
-        return certificateService.patchUpdateCertificate(id, fields);
+                                                         @RequestBody RequestCertificateDto requestCertificateDto) {
+        return certificateService.patchUpdateCertificate(id, requestCertificateDto);
     }
+
     /**
      * method delete certificate
      *
      * @param id is getting from url
-     * @return true or false
+     * @return String message
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public boolean deleteCertificateById(@PathVariable("id") long id) {
-        return certificateService.deleteCertificateById(id);
+    public String deleteCertificateById(@PathVariable("id") long id) {
+        certificateService.deleteCertificateById(id);
+        return "Successfully deleted certificate with id:" + id;
     }
 }

@@ -11,6 +11,6 @@ public interface CertificateService {
     ResponseCertificateDto getCertificateById(long id);
     ResponseCertificateDto addCertificate(RequestCertificateDto certificateDTO);
     ResponseCertificateDto updateCertificate(long id, RequestCertificateDto certificateDTO);
-    ResponseCertificateDto patchUpdateCertificate(long id, Map<String, Object> fields);
+    ResponseCertificateDto patchUpdateCertificate(long id, RequestCertificateDto requestCertificateDto);
     boolean deleteCertificateById(long id);
 }

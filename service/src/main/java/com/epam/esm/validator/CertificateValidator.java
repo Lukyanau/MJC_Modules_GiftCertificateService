@@ -27,7 +27,7 @@ public class CertificateValidator {
     private static final String PRICE_REGEX = "^\\d+\\.?\\d+$";
     private static final String ID_REGEX = "^[0-9]+$";
     private static final String DURATION_REGEX = ID_REGEX;
-    private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{3,50})$";
+    private static final String NAME_REGEX = "^([a-zA-Z0-9][a-zA-Z0-9, .]{3,50})$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDto(RequestCertificateDto certificateDto) {
@@ -73,12 +73,6 @@ public class CertificateValidator {
         }
         if (!(MIN_CERTIFICATE_DURATION <= duration && duration <= MAX_CERTIFICATE_DURATION)) {
             throw new ServiceException(WRONG_CERTIFICATE_DURATION_RANGE);
-        }
-    }
-
-    public void validatePatchUpdateParams(Object key, Object value){
-        if(key == "tags"){
-            List<Object> tagList = List.of(value);
         }
     }
 
