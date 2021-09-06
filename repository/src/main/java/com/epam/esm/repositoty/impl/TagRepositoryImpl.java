@@ -1,24 +1,22 @@
 package com.epam.esm.repositoty.impl;
 
-import com.epam.esm.repositoty.SqlQuery;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repositoty.impl.query.SqlQuery;
 import com.epam.esm.repositoty.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class TagRepositoryImpl implements TagRepository {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public TagRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Tag add(Tag tag) {
@@ -27,15 +25,15 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Tag getById(long id) {
+    public Optional<Tag> getById(long id) {
         return jdbcTemplate.query(SqlQuery.GET_TAG_BY_ID, new BeanPropertyRowMapper<>(Tag.class), id)
-                .stream().findAny().orElse(null);
+                .stream().findAny();
     }
 
     @Override
-    public Tag getByName(String name) {
+    public Optional<Tag> getByName(String name) {
         return jdbcTemplate.query(SqlQuery.GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name)
-                .stream().findAny().orElse(null);
+                .stream().findAny();
     }
 
     @Override
@@ -44,18 +42,27 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> getAll() {
-        return jdbcTemplate.query(SqlQuery.GET_ALL_TAGS, new BeanPropertyRowMapper<>(Tag.class));
+    public Optional<List<Tag>> getAll(Map<String,String> searchParams) {
+        return Optional.of(jdbcTemplate.query(SqlQuery.GET_ALL_TAGS, new BeanPropertyRowMapper<>(Tag.class)));
     }
 
     @Override
-    public List<Long> getTagsIdsByCertificateId(long id) {
-        return jdbcTemplate.queryForList(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID, Long.class, id);
+    public Optional<List<Long>> getTagsIdsByCertificateId(long id) {
+        return Optional.of(jdbcTemplate.queryForList(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID, Long.class, id));
     }
 
     @Override
-    public boolean delete(long id) {
-        return jdbcTemplate.update(SqlQuery.DELETE_TAG_BY_ID, id) > 0;
+    public int delete(long id) {
+        return jdbcTemplate.update(SqlQuery.DELETE_TAG_BY_ID, id);
     }
 
+    @Override
+    public Long checkUsedTags(long id) {
+        return jdbcTemplate.queryForObject(SqlQuery.CHECK_USED_TAGS, Long.class, id);
+    }
+
+    @Override
+    public void deleteFromCrossTable(long tagId, long certificateId) {
+        jdbcTemplate.update(SqlQuery.DELETE_FROM_CROSS_TABLE, tagId, certificateId);
+    }
 }

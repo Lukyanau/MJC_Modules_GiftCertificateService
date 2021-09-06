@@ -9,10 +9,15 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
 
+/**
+ * Service configuration with
+ * modelMapper bean for mapping objects
+ */
 @Configuration
 @EnableTransactionManagement
 @ComponentScan("com.epam.esm.service")
 public class ServiceConfiguration {
+
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();

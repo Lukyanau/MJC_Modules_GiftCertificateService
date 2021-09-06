@@ -1,46 +1,40 @@
 package com.epam.esm.exception;
 
 import com.epam.esm.exception.exception_code.ExceptionDescription;
-import org.springframework.stereotype.Component;
 
-@Component
+/**
+ * Custom exception class for
+ * service and validators
+ * @author Lukyana I.M.
+ * @version 1.0
+ */
 public class ServiceException extends RuntimeException {
-    private String errorCode;
-    private String message;
 
-    public ServiceException() {
-    }
+    private String errorCode;
+    private String errorReason;
 
     public ServiceException(ExceptionDescription exceptionDescription) {
         super();
-        this.errorCode = exceptionDescription.getId();
-        this.message = exceptionDescription.getMessage();
+        this.errorCode = exceptionDescription.getErrorCode();
     }
 
-    public ServiceException(String message) {
-        super(message);
-    }
-
-    public ServiceException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ServiceException(Throwable cause) {
-        super(cause);
+    public ServiceException(ExceptionDescription exceptionDescription, String errorReason) {
+        super();
+        this.errorCode = exceptionDescription.getErrorCode();
+        this.errorReason = errorReason;
     }
 
     public String getErrorCode() {
         return errorCode;
     }
 
-    @Override
-    public String getMessage() {
-        return message;
+    public String getErrorReason() {
+        return errorReason;
     }
 
     @Override
     public String toString() {
-        return "errorCode='" + errorCode + '\n' +
-                "message='" + message;
+        return "errorCode=" + errorCode + '\n' +
+                "reason=" + errorReason;
     }
 }

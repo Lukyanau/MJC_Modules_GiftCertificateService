@@ -1,51 +1,53 @@
 package com.epam.esm.exception.exception_code;
 
+/**
+ * Class with exception codes
+ * for ServiceException
+ * @see com.epam.esm.exception.ServiceException
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
 public enum ExceptionDescription {
     //Certificate codes 1-100
 
-    INVALID_CERTIFICATE_ID("001", "Invalid certificate id. Should be from 1 and more"),
-    CERTIFICATE_WITH_ID_NOT_FOUND("002", "Certificate with this id not found"),
-    NOT_FOUND_CERTIFICATES("003","No certificates found"),
-    INVALID_CERTIFICATE_NAME("004","Invalid certificate name."),
-    INVALID_CERTIFICATE_DESCRIPTION("005","Invalid certificate description."),
-    INVALID_CERTIFICATE_PRICE("006","Invalid certificate price."),
-    WRONG_CERTIFICATE_PRICE_RANGE("007","Wrong certificate price range. Should be from 1 to 1000"),
-    INVALID_CERTIFICATE_DURATION("008","Invalid certificate duration"),
-    WRONG_CERTIFICATE_DURATION_RANGE("009","Wrong certificate duration. Should be from 30 to 180"),
-    CERTIFICATE_WITH_NAME_NOT_FOUND("010","Certificate with this name not found."),
-    NOT_ADD_CERTIFICATE("011","Certificate with this name already exists."),
-    NOT_UPDATE_CERTIFICATE("012","No certificate with this id."),
-    NO_SEARCH_PARAMETERS_FOR_CERTIFICATE("013","No search parameters for certificate."),
+    INVALID_CERTIFICATE_ID("CF-00001"),
+    CERTIFICATE_WITH_ID_NOT_FOUND("CF-00002"),
+    NOT_FOUND_CERTIFICATES("CF-00003"),
+    INVALID_CERTIFICATE_NAME("CF-00004"),
+    INVALID_CERTIFICATE_DESCRIPTION("CF-00005"),
+    INVALID_CERTIFICATE_PRICE("CF-00006"),
+    WRONG_CERTIFICATE_PRICE_RANGE("CF-00007"),
+    INVALID_CERTIFICATE_DURATION("CF-00008"),
+    WRONG_CERTIFICATE_DURATION_RANGE("CF-00009"),
+    CERTIFICATE_WITH_NAME_NOT_FOUND("CF-00010"),
+    NOT_ADD_CERTIFICATE("CF-00011"),
+    NOT_UPDATE_CERTIFICATE("CF-00012"),
+    NO_SEARCH_PARAMETERS_FOR_CERTIFICATE("CF-00013"),
+    INVALID_PART_OF_NAME_PARAMETER("CF-00014"),
+    INVALID_PART_OF_DESCRIPTION_PARAMETER("CF-00015"),
+    INVALID_SORT_BY("CF-00016"),
+    INVALID_SORT_TYPE("CF-00017"),
+    NO_SUCH_SEARCH_PARAMETER("CF-00018"),
+    INVALID_SEARCH_PARAMETER_VALUE("CF-00019"),
 
     //Tag codes 101-200
 
-    INVALID_TAG_ID("101", "Invalid tag id. Should be from 1 and more"),
-    TAG_WITH_ID_NOT_FOUND("102", "Tag with this id not found"),
-    TAG_WITH_NAME_NOT_FOUND("103", "Tag with this name not found"),
-    INVALID_TAG_NAME("104","Cannot add tag with this name"),
-    NOT_FOUND_TAGS("105","No tags found"),
-    NOT_ADD_TAG("106","Tag with this name already exists");
+    INVALID_TAG_ID("TG-00001"),
+    TAG_WITH_ID_NOT_FOUND("TG-00002"),
+    TAG_WITH_NAME_NOT_FOUND("TG-00003"),
+    INVALID_TAG_NAME("TG-00004"),
+    NOT_FOUND_TAGS("TG-00005"),
+    NOT_ADD_TAG("TG-00006"),
+    TAG_USED_IN_SOME_CERTIFICATES("TG-00007");
 
 
-    private final String id;
-    private final String message;
+    private final String errorCode;
 
-    ExceptionDescription(String id, String message) {
-        this.id = id;
-        this.message = message;
+    ExceptionDescription(String errorCode) {
+        this.errorCode = errorCode;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + id + "\n" +
-                "message='" + message;
+    public String getErrorCode() {
+        return errorCode;
     }
 }

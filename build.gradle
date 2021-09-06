@@ -9,13 +9,20 @@ allprojects {
     apply plugin: 'java'
     ext {
         springVersion = '5.3.8'
+        log4jVersion = '2.12.1'
     }
     repositories {
         mavenCentral()
     }
     dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.20'
+        annotationProcessor 'org.projectlombok:lombok:1.18.20'
+        testCompileOnly 'org.projectlombok:lombok:1.18.20'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
         implementation "org.springframework:spring-core:${springVersion}"
         implementation "org.springframework:spring-context:${springVersion}"
+        implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+        implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
     }
 }
 

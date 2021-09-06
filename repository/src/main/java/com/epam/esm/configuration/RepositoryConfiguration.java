@@ -2,15 +2,21 @@ package com.epam.esm.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionManager;
 
+/**
+ * Configuration for connection pool
+ * and dataSource
+ *
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
+
 @Configuration
+@Profile("prod")
 @ComponentScan("com.epam.esm")
 @PropertySource("classpath:property/db.properties")
 public class RepositoryConfiguration {
@@ -25,7 +31,7 @@ public class RepositoryConfiguration {
     private String password;
 
     @Bean
-    public HikariDataSource hikariDataSource(){
+    public HikariDataSource hikariDataSource() {
         HikariDataSource hikariConfig = new HikariDataSource();
         hikariConfig.setDriverClassName(driverName);
         hikariConfig.setJdbcUrl(dbUrl);
@@ -35,12 +41,12 @@ public class RepositoryConfiguration {
     }
 
     @Bean
-    public TransactionManager transactionManager(HikariDataSource hikariDataSource){
+    public TransactionManager transactionManager(HikariDataSource hikariDataSource) {
         return new DataSourceTransactionManager(hikariDataSource);
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(HikariDataSource hikariDataSource){
+    public JdbcTemplate jdbcTemplate(HikariDataSource hikariDataSource) {
         return new JdbcTemplate(hikariDataSource);
     }
 

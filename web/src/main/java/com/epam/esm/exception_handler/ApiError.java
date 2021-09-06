@@ -1,43 +1,19 @@
 package com.epam.esm.exception_handler;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-
+/**
+ * Class that return object for
+ * handling exceptions
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
+@Data
 public class ApiError {
-    private HttpStatus status;
-    private final String message;
-    private final List<String> errors;
 
-    public ApiError(HttpStatus status, String message, List<String> errors) {
-        super();
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
+    private final HttpStatus httpStatus;
+    private final String errorMessage;
+    private final String errorCode;
 
-    public ApiError(String message, String error) {
-        super();
-        this.message = message;
-        this.errors = List.of(error);
-    }
-
-    public ApiError(HttpStatus status, String message, String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = List.of(error);
-    }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public List<String> getErrors() {
-        return errors;
-    }
 }

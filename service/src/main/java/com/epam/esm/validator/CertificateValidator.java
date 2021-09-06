@@ -5,9 +5,17 @@ import com.epam.esm.exception.ServiceException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
+/**
+ * Validator for certificates from request
+ *
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
 @Component
 public class CertificateValidator {
 
@@ -19,7 +27,7 @@ public class CertificateValidator {
     private static final String PRICE_REGEX = "^\\d+\\.?\\d+$";
     private static final String ID_REGEX = "^[0-9]+$";
     private static final String DURATION_REGEX = ID_REGEX;
-    private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{3,30})+$";
+    private static final String NAME_REGEX = "^([a-zA-Z][a-zA-Z, ]{3,50})$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDto(RequestCertificateDto certificateDto) {
@@ -29,46 +37,52 @@ public class CertificateValidator {
         checkCertificateDtoDuration(certificateDto.getDuration());
     }
 
-    public void checkCertificateDtoId(long id) {
-        if (!isNotEmptyOrNull(String.valueOf(id)) || !String.valueOf(id).matches(ID_REGEX) || id < MIN_CERTIFICATE_ID) {
-            throw new ServiceException(INVALID_CERTIFICATE_ID);
+    public void checkCertificateDtoId(Long id) {
+        if (id == null || !id.toString().matches(ID_REGEX) || id < MIN_CERTIFICATE_ID) {
+            throw new ServiceException(INVALID_CERTIFICATE_ID, String.valueOf(id));
         }
     }
 
     public void checkCertificateDtoName(String name) {
-        if (!isNotEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_NAME);
+        if (isEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_NAME, name);
         }
     }
 
     public void checkCertificateDtoDescription(String description) {
-        if (!isNotEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
+        if (isEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION, description);
         }
     }
 
     public void checkCertificateDtoPrice(BigDecimal price) {
         String strPrice = String.valueOf(price);
-        if (!isNotEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_PRICE);
+        if (isEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_PRICE, String.valueOf(price));
         }
         int certificatePrice = price.intValue();
         if (!(MIN_CERTIFICATE_PRICE <= certificatePrice && certificatePrice <= MAX_CERTIFICATE_PRICE)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
+            throw new ServiceException(WRONG_CERTIFICATE_PRICE_RANGE);
         }
     }
 
     public void checkCertificateDtoDuration(int duration) {
         String strDuration = String.valueOf(duration);
-        if (!isNotEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DURATION);
+        if (isEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_DURATION, String.valueOf(duration));
         }
-        if (!(duration > MIN_CERTIFICATE_DURATION && duration < MAX_CERTIFICATE_DURATION)) {
+        if (!(MIN_CERTIFICATE_DURATION <= duration && duration <= MAX_CERTIFICATE_DURATION)) {
             throw new ServiceException(WRONG_CERTIFICATE_DURATION_RANGE);
         }
     }
 
-    private static boolean isNotEmptyOrNull(String str) {
-        return str != null && !str.isEmpty();
+    public void validatePatchUpdateParams(Object key, Object value){
+        if(key == "tags"){
+            List<Object> tagList = List.of(value);
+        }
+    }
+
+    private static boolean isEmptyOrNull(String str) {
+        return str == null || str.isEmpty();
     }
 }

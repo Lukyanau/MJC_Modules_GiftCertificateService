@@ -1,24 +1,23 @@
 package com.epam.esm.repositoty.impl;
 
-import com.epam.esm.repositoty.SqlQuery;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repositoty.CertificateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.epam.esm.repositoty.impl.query.SqlQuery;
+import com.epam.esm.repositoty.impl.query.SqlQueryCreator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class CertificateRepositoryImpl implements CertificateRepository {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public CertificateRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public GiftCertificate add(GiftCertificate giftCertificate) {
@@ -29,20 +28,15 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
-    public GiftCertificate getById(long id) {
+    public Optional<GiftCertificate> getById(long id) {
         return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_BY_ID,
-                new BeanPropertyRowMapper<>(GiftCertificate.class), id).stream().findAny().orElse(null);
+                new BeanPropertyRowMapper<>(GiftCertificate.class), id).stream().findAny();
     }
 
     @Override
-    public GiftCertificate getByName(String name) {
-        return jdbcTemplate.query(SqlQuery.GET_CERTIFICATE_BY_NAME,
-                new BeanPropertyRowMapper<>(GiftCertificate.class), name).stream().findAny().orElse(null);
-    }
-
-    @Override
-    public List<GiftCertificate> getAll() {
-        return jdbcTemplate.query(SqlQuery.GET_ALL_CERTIFICATES, new BeanPropertyRowMapper<>(GiftCertificate.class));
+    public Optional<List<GiftCertificate>> getAll(Map<String,String> searchParams) {
+        return Optional.of(jdbcTemplate.query(SqlQueryCreator.createQueryFromSearchParameters(searchParams),
+                new BeanPropertyRowMapper<>(GiftCertificate.class)));
     }
 
     @Override
@@ -51,8 +45,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
-    public boolean delete(long id) {
-        return jdbcTemplate.update(SqlQuery.DELETE_CERTIFICATE_BY_ID, id) > 0;
+    public int delete(long id) {
+        return jdbcTemplate.update(SqlQuery.DELETE_CERTIFICATE_BY_ID, id);
     }
 
 
@@ -62,9 +56,9 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
-    public GiftCertificate updateCertificate(GiftCertificate giftCertificate) {
-        jdbcTemplate.update(SqlQuery.UPDATE_CERTIFICATE_BY_NAME, giftCertificate.getDescription(), giftCertificate.getPrice(),
-                giftCertificate.getDuration(), giftCertificate.getUpdated(), giftCertificate.getName());
-        return giftCertificate;
+    public void updateCertificate(long id, GiftCertificate giftCertificate) {
+        jdbcTemplate.update(SqlQuery.UPDATE_CERTIFICATE_BY_NAME, giftCertificate.getName(),
+                giftCertificate.getDescription(), giftCertificate.getPrice(),
+                giftCertificate.getDuration(), giftCertificate.getUpdated(), giftCertificate.getId());
     }
 }

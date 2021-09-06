@@ -6,27 +6,32 @@ import org.springframework.stereotype.Component;
 import static com.epam.esm.exception.exception_code.ExceptionDescription.INVALID_TAG_ID;
 import static com.epam.esm.exception.exception_code.ExceptionDescription.INVALID_TAG_NAME;
 
+/**
+ * Validator for tags from request
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
 @Component
 public class TagValidator {
 
     private static final long MIN_TAG_ID = 1;
     private static final String ID_REGEX = "^[0-9]+$";
-    private static final String NAME_REGEX = "^(#[a-zA-Z0-9]{3,20})$";
+    private static final String NAME_REGEX = "^([a-zA-Z0-9]{3,50})$";
 
-    public void checkTagDtoId(long id) {
-        if (!isNotEmptyOrNull(String.valueOf(id)) || !String.valueOf(id).matches(ID_REGEX) || id < MIN_TAG_ID) {
-            throw new ServiceException(INVALID_TAG_ID);
+    public void checkTagDtoId(Long id) {
+        if (id == null || !id.toString().matches(ID_REGEX) || id < MIN_TAG_ID) {
+            throw new ServiceException(INVALID_TAG_ID, String.valueOf(id));
         }
     }
 
     public void checkTagDtoName(String name) {
-        if (!isNotEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_TAG_NAME);
+        if (isEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
+            throw new ServiceException(INVALID_TAG_NAME, String.valueOf(name));
         }
     }
 
-    private static boolean isNotEmptyOrNull(String str) {
-        return str != null && !str.isEmpty();
+    private static boolean isEmptyOrNull(String str) {
+        return str == null || str.isEmpty();
     }
 
 }

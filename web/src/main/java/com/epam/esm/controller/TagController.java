@@ -2,49 +2,66 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/**
+ * Tag controller with CRD methods
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("tags")
 public class TagController {
 
     private final TagService tagService;
 
-    @Autowired
-    public TagController(TagService tagService) {
-        this.tagService = tagService;
-    }
-
+    /**
+     * method founds all tags with or without name sorting
+     * @param name is getting from url
+     * @return List of TagDto objects
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TagDto> getTags() {
-        return tagService.getTags();
+    public List<TagDto> getTags(@RequestParam(required = false) String name) {
+        return tagService.getTags(name);
     }
 
+    /**
+     * method founds tag by its id
+     * @param id is getting from url
+     * @return a tagDto object if it exists
+     */
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
+    // check if string input
     public TagDto getTagById(@PathVariable("id") long id) {
         return tagService.getTagById(id);
     }
 
-    @GetMapping(value = "/name")
-    @ResponseStatus(HttpStatus.OK)
-    public TagDto getTagByName(@RequestParam String name) {
-        return tagService.getTagByName(name);
-    }
-
+    /**
+     * method adds tag
+     * @param tagDto is getting from request body
+     * @return List of TagDto objects
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TagDto addTag(@RequestBody TagDto tagDto) {
         return tagService.addTag(tagDto);
     }
 
+    /**
+     * method deletes tag
+     * @param id is getting from url
+     * @return true or false
+     */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
+    // check if string input
+    //Maybe use NO_CONTENT
     public boolean deleteTagById(@PathVariable("id") long id) {
         return tagService.deleteTagById(id);
     }
