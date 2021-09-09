@@ -20,7 +20,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Tag add(Tag tag) {
-        jdbcTemplate.update(SqlQuery.ADD_TAG, tag.getName());
+        jdbcTemplate.update(SqlQuery.ADD_TAG, tag.getName().trim().toLowerCase());
         return tag;
     }
 
@@ -32,8 +32,8 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> getByName(String name) {
-        return jdbcTemplate.query(SqlQuery.GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name)
-                .stream().findAny();
+        return jdbcTemplate.query(SqlQuery.GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class),
+                        name.trim().toLowerCase()).stream().findAny();
     }
 
     @Override

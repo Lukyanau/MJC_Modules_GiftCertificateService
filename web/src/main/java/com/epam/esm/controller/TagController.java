@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 /**
  * Tag controller with CRD methods
  * @author Lukyanau I.M.
@@ -21,13 +23,13 @@ public class TagController {
 
     /**
      * method founds all tags with or without name sorting
-     * @param name is getting from url
+     * @param searchParams is getting from url
      * @return List of TagDto objects
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TagDto> getTags(@RequestParam(required = false) String name) {
-        return tagService.getTags(name);
+    public List<TagDto> getTags(@RequestParam(required = false) Map<String, String> searchParams) {
+        return tagService.getTags(searchParams);
     }
 
     /**
@@ -55,13 +57,10 @@ public class TagController {
     /**
      * method deletes tag
      * @param id is getting from url
-     * @return String message
      */
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    //Maybe use NO_CONTENT
-    public String deleteTagById(@PathVariable("id") long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTagById(@PathVariable("id") long id) {
         tagService.deleteTagById(id);
-        return "Successfully deleted tag with id: " + id;
     }
 }

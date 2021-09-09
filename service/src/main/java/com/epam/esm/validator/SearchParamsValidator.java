@@ -1,11 +1,12 @@
 package com.epam.esm.validator;
 
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.utils.CertificateSearchParameters;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 import static com.epam.esm.utils.CertificateSearchParameters.*;
@@ -18,39 +19,39 @@ import static com.epam.esm.utils.CertificateSearchParameters.*;
  */
 @Component
 public class SearchParamsValidator {
-    private static final String SORT_BY_NAME = "name";
-    private static final String SORT_BY_CREATED_DATE = "created";
-    private static final String SORT_TYPE_ASC = "asc";
-    private static final String SORT_TYPE_DESC = "desc";
+    private static final String ORDER_BY_NAME = "name";
+    private static final String ORDER_BY_CREATED = "created";
+    private static final String SORT_ASC = "asc";
+    private static final String SORT_DESC = "desc";
+    private static final String PARAMETER_REGEX = "^(.{3,50})$";
 
 
     public void checkSearchParams(Map<String, String> searchParams) {
         validateSearchMapKeys(searchParams.keySet());
-        searchParams.values().forEach(s -> {
-            if (isEmptyOrNull(s)) {
+        searchParams.values().forEach(param -> {
+            if (isEmptyOrNull(param.trim()) || !param.trim().matches(PARAMETER_REGEX)) {
                 throw new ServiceException(INVALID_SEARCH_PARAMETER_VALUE);
             }
         });
-        if (searchParams.containsKey(SORT_BY)) {
-            if (!searchParams.get(SORT_BY).equalsIgnoreCase(SORT_BY_NAME) &&
-                    !searchParams.get(SORT_BY).equalsIgnoreCase(SORT_BY_CREATED_DATE)) {
-                throw new ServiceException(INVALID_SORT_BY, searchParams.get(SORT_BY));
+        if (searchParams.containsKey(ORDER_BY)) {
+            if (!searchParams.get(ORDER_BY).equalsIgnoreCase(ORDER_BY_NAME) &&
+                    !searchParams.get(ORDER_BY).equalsIgnoreCase(ORDER_BY_CREATED)) {
+                throw new ServiceException(INVALID_ORDER_BY, searchParams.get(ORDER_BY));
             }
         }
-        if (searchParams.containsKey(SORT_TYPE)) {
-            if (!(searchParams.get(SORT_TYPE).equalsIgnoreCase(SORT_TYPE_ASC) ||
-                    searchParams.get(SORT_TYPE).equalsIgnoreCase(SORT_TYPE_DESC)) || !searchParams.containsKey(SORT_BY)) {
-                throw new ServiceException(INVALID_SORT_TYPE, searchParams.get(SORT_TYPE));
+        if (searchParams.containsKey(SORT)) {
+            if (!(searchParams.get(SORT).equalsIgnoreCase(SORT_ASC) ||
+                    searchParams.get(SORT).equalsIgnoreCase(SORT_DESC)) || !searchParams.containsKey(ORDER_BY)) {
+                throw new ServiceException(INVALID_SORT, searchParams.get(SORT));
             }
         }
     }
 
     private void validateSearchMapKeys(Set<String> keySet) {
-        List<String> searchKeys = Arrays.asList(PART_OF_NAME.toLowerCase(), PART_OF_DESCRIPTION.toLowerCase(),
-                SORT_BY.toLowerCase(), SORT_TYPE.toLowerCase(), TAG_NAME.toLowerCase());
-        keySet.forEach(k -> {
-            if (!searchKeys.contains(k.trim().toLowerCase())) {
-                throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, k);
+        List<String> searchKeys = Arrays.asList(NAME, DESCRIPTION, ORDER_BY, SORT, TAG_NAME);
+        keySet.forEach(key -> {
+            if (!searchKeys.contains(key.trim())) {
+                throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, key);
             }
         });
     }

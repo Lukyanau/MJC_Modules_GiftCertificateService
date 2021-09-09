@@ -23,6 +23,9 @@ allprojects {
         implementation "org.springframework:spring-context:${springVersion}"
         implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
         implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
+        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
+
     }
 }
 

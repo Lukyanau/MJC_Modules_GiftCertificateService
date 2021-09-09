@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class RequestCertificateDto {
+
     private long id;
     private String name;
     private String description;

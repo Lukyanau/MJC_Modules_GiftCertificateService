@@ -10,8 +10,10 @@ import com.epam.esm.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,21 +36,28 @@ public class TagServiceImpl implements TagService {
     /**
      * Method for searching all tags
      *
-     * @param name is search parameter
+     * @param searchParam is search parameter
      * @return list of founded objects
      */
     @Override
-    public List<TagDto> getTags(String name) {
+    public List<TagDto> getTags(Map<String, String> searchParam) {
         Optional<List<Tag>> allTags = tagRepository.getAll(Collections.emptyMap());
         if (allTags.isEmpty()) {
             throw new ServiceException(NOT_FOUND_TAGS);
         }
         List<Tag> currentTags = allTags.get();
-        if (name != null) {
-            tagValidator.checkTagDtoName(name.trim());
-            List<Tag> filteredTags = currentTags.stream().filter(t -> t.getName().equals(name.trim().toLowerCase()))
-                    .collect(Collectors.toList());
-            return filteredTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
+        if (!searchParam.isEmpty()) {
+            if (searchParam.get("name") != null) {
+                tagValidator.checkTagDtoName(searchParam.get("name").trim());
+                List<Tag> filteredTags = currentTags.stream().filter(tag -> tag.getName().
+                                equals(searchParam.get("name").trim().toLowerCase()))
+                        .collect(Collectors.toList());
+                if (filteredTags.isEmpty()) {
+                    throw new ServiceException(NO_TAGS_WITH_THIS_NAME, searchParam.get("name").trim());
+                }
+                return filteredTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
+            }
+            throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, searchParam.keySet().toString());
         }
         return currentTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
     }
@@ -77,10 +86,10 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public TagDto addTag(TagDto tagDto) {
-        tagValidator.checkTagDtoName(tagDto.getName().trim());
-        tagDto.setName(tagDto.getName().trim().toLowerCase());
+        tagValidator.checkTagDtoName(tagDto.getName());
+        tagDto.setName(tagDto.getName());
         if (tagRepository.getByName(tagDto.getName()).isPresent()) {
-            throw new ServiceException(NOT_ADD_TAG);
+            throw new ServiceException(NOT_ADD_TAG, tagDto.getName().trim());
         }
         Tag currentTag = tagRepository.add(tagMapper.convertToEntity(tagDto));
         currentTag.setId(tagRepository.getTagId(currentTag.getName()));
@@ -99,10 +108,10 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.checkUsedTags(id) > 0) {
             throw new ServiceException(TAG_USED_IN_SOME_CERTIFICATES, String.valueOf(id));
         }
-        if (!(tagRepository.delete(id)>0)){
+        if (!(tagRepository.delete(id) > 0)) {
             throw new ServiceException(NOT_DELETE_TAG, String.valueOf(id));
         }
-        return tagRepository.delete(id) > 0;
+        return true;
     }
 
     /**
@@ -126,7 +135,8 @@ public class TagServiceImpl implements TagService {
 
     /**
      * Method for deleting relations between certificate and tag
-     * @param tagId is tag id
+     *
+     * @param tagId         is tag id
      * @param certificateId is certificate id
      */
     @Override

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Certificate controller with CRUD methods
@@ -44,7 +43,6 @@ public class CertificateController {
      */
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    // check if string input
     public ResponseCertificateDto getCertificateById(@PathVariable("id") long id) {
         return certificateService.getCertificateById(id);
     }
@@ -69,12 +67,18 @@ public class CertificateController {
      */
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    // check if string input
     public ResponseCertificateDto updateCertificate(@PathVariable("id") long id,
                                                     @RequestBody RequestCertificateDto certificateDto) {
         return certificateService.updateCertificate(id, certificateDto);
     }
 
+    /**
+     * method do partial update of certificate
+     *
+     * @param id is certificate id
+     * @param requestCertificateDto is certificate with updating fields
+     * @return updated certificate
+     */
     @PatchMapping({"/{id}"})
     @ResponseStatus(HttpStatus.OK)
     public ResponseCertificateDto patchUpdateCertificate(@PathVariable("id") long id,
@@ -86,12 +90,10 @@ public class CertificateController {
      * method delete certificate
      *
      * @param id is getting from url
-     * @return String message
      */
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public String deleteCertificateById(@PathVariable("id") long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCertificateById(@PathVariable("id") long id) {
         certificateService.deleteCertificateById(id);
-        return "Successfully deleted certificate with id:" + id;
     }
 }

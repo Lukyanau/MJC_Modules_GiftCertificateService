@@ -5,8 +5,6 @@ import com.epam.esm.exception.ServiceException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
@@ -27,7 +25,7 @@ public class CertificateValidator {
     private static final String PRICE_REGEX = "^\\d+\\.?\\d+$";
     private static final String ID_REGEX = "^[0-9]+$";
     private static final String DURATION_REGEX = ID_REGEX;
-    private static final String NAME_REGEX = "^([a-zA-Z0-9][a-zA-Z0-9, .]{3,50})$";
+    private static final String NAME_REGEX = "^(.{3,50})$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDto(RequestCertificateDto certificateDto) {
@@ -44,14 +42,14 @@ public class CertificateValidator {
     }
 
     public void checkCertificateDtoName(String name) {
-        if (isEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_NAME, name);
+        if (isEmptyOrNull(name) || !name.trim().matches(NAME_REGEX)) {
+            throw new ServiceException(INVALID_CERTIFICATE_NAME);
         }
     }
 
     public void checkCertificateDtoDescription(String description) {
         if (isEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION, description);
+            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
         }
     }
 
@@ -68,7 +66,7 @@ public class CertificateValidator {
 
     public void checkCertificateDtoDuration(int duration) {
         String strDuration = String.valueOf(duration);
-        if (isEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX)) {
+        if (isEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX) || duration == 0) {
             throw new ServiceException(INVALID_CERTIFICATE_DURATION, String.valueOf(duration));
         }
         if (!(MIN_CERTIFICATE_DURATION <= duration && duration <= MAX_CERTIFICATE_DURATION)) {

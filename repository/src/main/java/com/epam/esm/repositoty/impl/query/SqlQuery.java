@@ -18,7 +18,7 @@ public class SqlQuery {
 
     //Tag table
     public static final String ADD_TAG = "INSERT INTO tag(name) VALUES (?)";
-    public static final String GET_ALL_TAGS = "SELECT id, name FROM tag";
+    public static final String GET_ALL_TAGS = "SELECT id, name FROM tag ORDER BY id ASC";
     public static final String GET_TAG_ID = "SELECT id FROM tag WHERE name=?";
     public static final String GET_TAG_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     public static final String GET_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name=?";

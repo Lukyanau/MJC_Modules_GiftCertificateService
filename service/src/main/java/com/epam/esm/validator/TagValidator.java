@@ -16,7 +16,7 @@ public class TagValidator {
 
     private static final long MIN_TAG_ID = 1;
     private static final String ID_REGEX = "^[0-9]+$";
-    private static final String NAME_REGEX = "^([a-zA-Z0-9]{3,50})$";
+    private static final String NAME_REGEX = "^(.{3,50})$";
 
     public void checkTagDtoId(Long id) {
         if (id == null || !id.toString().matches(ID_REGEX) || id < MIN_TAG_ID) {
@@ -25,8 +25,8 @@ public class TagValidator {
     }
 
     public void checkTagDtoName(String name) {
-        if (isEmptyOrNull(name) || !name.matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_TAG_NAME, String.valueOf(name));
+        if (isEmptyOrNull(name) || !name.trim().matches(NAME_REGEX)) {
+            throw new ServiceException(INVALID_TAG_NAME, name.trim());
         }
     }
 

@@ -23,13 +23,13 @@ public class SqlQueryCreator {
     }
 
     private static void createFromSearchParams(Map<String, String> searchParams, StringBuilder preparedQuery) {
-        if (searchParams.containsKey(PART_OF_NAME) || searchParams.containsKey(PART_OF_DESCRIPTION)) {
+        if (searchParams.containsKey(NAME) || searchParams.containsKey(DESCRIPTION)) {
             preparedQuery.append(" WHERE ");
-            if (searchParams.containsKey(PART_OF_NAME)) {
-                preparedQuery.append(" name LIKE '%").append(searchParams.get(PART_OF_NAME)).append("%' AND");
+            if (searchParams.containsKey(NAME)) {
+                preparedQuery.append(" name LIKE '%").append(searchParams.get(NAME).trim()).append("%' AND");
             }
-            if (searchParams.containsKey(PART_OF_DESCRIPTION)) {
-                preparedQuery.append(" description LIKE '%").append(searchParams.get(PART_OF_DESCRIPTION)).append("%' ");
+            if (searchParams.containsKey(DESCRIPTION)) {
+                preparedQuery.append(" description LIKE '%").append(searchParams.get(DESCRIPTION).trim()).append("%' ");
             }
             if (preparedQuery.substring(preparedQuery.length() - 4).equalsIgnoreCase(" AND")) {
                 preparedQuery.delete(preparedQuery.length() - 3, preparedQuery.length());
@@ -38,11 +38,11 @@ public class SqlQueryCreator {
     }
 
     private static void createFromSortParams(Map<String, String> searchParams, StringBuilder preparedQuery) {
-        if (searchParams.containsKey(SORT_BY)) {
-            preparedQuery.append(" ORDER BY ").append(searchParams.get(SORT_BY));
+        if (searchParams.containsKey(ORDER_BY)) {
+            preparedQuery.append(" ORDER BY ").append(searchParams.get(ORDER_BY).trim());
         }
-        if (searchParams.containsKey(SORT_TYPE)) {
-            preparedQuery.append(" ").append(searchParams.get(SORT_TYPE));
+        if (searchParams.containsKey(SORT)) {
+            preparedQuery.append(" ").append(searchParams.get(SORT).trim());
         }
     }
 }

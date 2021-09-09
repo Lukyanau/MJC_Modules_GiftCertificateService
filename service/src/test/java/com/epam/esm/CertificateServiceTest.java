@@ -191,11 +191,10 @@ public class CertificateServiceTest {
     }
 
     @Test
-    void deleteCertificateByIdNotExistsCertificateShouldReturnFalse(){
+    void deleteCertificateByIdNotExistsCertificateShouldThrowException(){
         long certificateId = 9;
         when(certificateRepository.delete(anyLong())).thenReturn(0);
-        boolean actualResult = certificateService.deleteCertificateById(certificateId);
-        assertFalse(actualResult);
+        assertThrows(ServiceException.class, ()-> certificateService.deleteCertificateById(certificateId));
     }
 
     @Test

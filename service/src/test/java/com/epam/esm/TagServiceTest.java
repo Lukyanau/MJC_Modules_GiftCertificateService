@@ -49,16 +49,17 @@ public class TagServiceTest {
         Tag tag2 = new Tag();
         tag1.setId(2);
         tag1.setName("ford");
-        when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of(Arrays.asList(tag1, tag2)));
+        when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of(List.of(tag1, tag2)));
+        when(tagMapper.convertToDto(any(Tag.class))).thenReturn(any(TagDto.class));
         int expectedSize = 2;
-        int actualSize = tagService.getTags(null).size();
+        int actualSize = tagService.getTags(Collections.emptyMap()).size();
         assertEquals(expectedSize, actualSize);
     }
 
     @Test
     void getTagsNoTagsShouldThrowException() {
         when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.empty());
-        assertThrows(ServiceException.class, () -> tagService.getTags(anyString()));
+        assertThrows(ServiceException.class, () -> tagService.getTags(anyMap()));
     }
 
     @Test
@@ -101,7 +102,7 @@ public class TagServiceTest {
     @Test
     void addTagIncorrectDataShouldThrowException() {
         TagDto expectedTag = new TagDto();
-        expectedTag.setName("incorrectName@@@");
+        expectedTag.setName("in");
         assertThrows(ServiceException.class, () -> tagService.addTag(expectedTag));
     }
 
@@ -114,11 +115,11 @@ public class TagServiceTest {
     }
 
     @Test
-    void deleteTagByIdNonExistTagShouldReturnFalse() {
-        long correctId = 10;
+    void deleteTagByIdNonExistTagShouldThrowException() {
+        long correctIdNotExist = 10;
         when(tagRepository.checkUsedTags(anyLong())).thenReturn(0L);
         when(tagRepository.delete(anyLong())).thenReturn(0);
-        assertFalse(tagService.deleteTagById(correctId));
+        assertThrows(ServiceException.class, () -> tagService.deleteTagById(correctIdNotExist));
     }
 
     @Test
