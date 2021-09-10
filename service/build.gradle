@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: "${springVersion}"
+    implementation 'org.modelmapper:modelmapper:2.4.4'
+    implementation project(':repository')
+}
+
+test {
+    useJUnitPlatform()
+}

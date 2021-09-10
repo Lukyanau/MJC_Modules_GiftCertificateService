@@ -1,0 +1,36 @@
+plugins {
+    id 'war'
+}
+
+group 'com.epam.esm'
+version '1.0'
+
+allprojects {
+    apply plugin: 'java'
+    ext {
+        springVersion = '5.3.8'
+        log4jVersion = '2.12.1'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.20'
+        annotationProcessor 'org.projectlombok:lombok:1.18.20'
+        testCompileOnly 'org.projectlombok:lombok:1.18.20'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+        implementation "org.springframework:spring-core:${springVersion}"
+        implementation "org.springframework:spring-context:${springVersion}"
+        implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+        implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
+        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
+
+    }
+}
+
+dependencies {
+    implementation project(':web')
+    implementation project(':repository')
+    implementation project(':service')
+}

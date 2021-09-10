@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '5.2.9.RELEASE'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    implementation group: 'org.springframework', name: 'spring-beans', version: "${springVersion}"
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: "${springVersion}"
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.16'
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+
+}
+
+test {
+    useJUnitPlatform()
+}
