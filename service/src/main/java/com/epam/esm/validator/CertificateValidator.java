@@ -43,12 +43,12 @@ public class CertificateValidator {
 
     public void checkCertificateDtoName(String name) {
         if (isEmptyOrNull(name) || !name.trim().matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_NAME);
+            throw new ServiceException(INVALID_CERTIFICATE_NAME );
         }
     }
 
     public void checkCertificateDtoDescription(String description) {
-        if (isEmptyOrNull(description) || !description.matches(DESCRIPTION_REGEX)) {
+        if (isEmptyOrNull(description) || !description.trim().matches(DESCRIPTION_REGEX)) {
             throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
         }
     }

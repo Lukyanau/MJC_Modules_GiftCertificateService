@@ -10,6 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,7 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class RestExceptionHandler extends ResponseEntityExceptionHandler{
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ExceptionMessageTranslator translator;
 
@@ -41,6 +43,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
      *
      * @param ex is object with exception description
      * @return ApiError object
+     * @see ServiceException
      * @see ApiError
      */
     @ExceptionHandler(ServiceException.class)
@@ -57,7 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
     }
 
     /**
-     * Method for handling InvalidFormatException
+     * Method for handling InvalidFormatException exceptions
      *
      * @param ex is object with exception description
      * @return ApiError object
@@ -73,6 +76,172 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
         return new ApiError(localizedErrorMessage, "400");
     }
 
+    /**
+     * Method for handling MethodArgumentTypeMismatchException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see MethodArgumentTypeMismatchException
+     * @see ApiError
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.translateToLocale("TYPE_MISMATCH"), ex.getRequiredType());
+        LOGGER.error(ex.getLocalizedMessage());
+        return new ApiError(localizedErrorMessage, "400");
+    }
+
+    /**
+     * Method for handling HttpMediaTypeNotSupportedException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see HttpMediaTypeNotSupportedException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
+                                                                     HttpHeaders headers,
+                                                                     HttpStatus status,
+                                                                     WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("MEDIA_TYPE_NOT_SUPPORTED"), ex.getSupportedMediaTypes());
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling HttpMediaTypeNotAcceptableException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see HttpMediaTypeNotAcceptableException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex,
+                                                                      HttpHeaders headers,
+                                                                      HttpStatus status,
+                                                                      WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("MEDIA_TYPE_NOT_ACCEPTABLE"), ex.getSupportedMediaTypes());
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling MissingServletRequestParameterException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see MissingServletRequestParameterException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                          HttpHeaders headers,
+                                                                          HttpStatus status,
+                                                                          WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("PARAMETER_MISSING"), ex.getParameterName());
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling HttpMessageNotReadableException
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see HttpMessageNotReadableException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+        String localizedErrorMessage = "Message is not readable";
+        if (ex.getLocalizedMessage().contains("request body is missing")) {
+            localizedErrorMessage = translator.translateToLocale("REQUIRED_BODY_MISSING");
+        }
+        if (ex.getLocalizedMessage().contains("JSON parse error")) {
+            localizedErrorMessage = translator.translateToLocale("JSON_PARSE_ERROR");
+            // TODO: 10.09.2021 ask mentors how ot handle different types 
+        }
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling MissingServletRequestPartException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see MissingServletRequestPartException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
+                                                                     HttpHeaders headers,
+                                                                     HttpStatus status,
+                                                                     WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("MISSING_REQUEST_PART"), ex.getRequestPartName());
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling HttpRequestMethodNotSupportedException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see HttpRequestMethodNotSupportedException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
+                                                                         HttpHeaders headers, HttpStatus status,
+                                                                         WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("METHOD_NOT_SUPPORTED"), ex.getMethod());
+        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method for handling NoHandlerFoundException exceptions
+     *
+     * @param ex is object with exception description
+     * @return ApiError object
+     * @see NoHandlerFoundException
+     * @see ApiError
+     */
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(
+            NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        String localizedErrorMessage;
+        localizedErrorMessage = String.format(translator.
+                translateToLocale("NO_HANDLER_FOUND"), ex.getHttpMethod() + " " + ex.getRequestURL());
+        ApiError apiError = new ApiError(localizedErrorMessage, "404");
+        LOGGER.error(localizedErrorMessage);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
 
     /**
      * Method for handling NumberFormatException exceptions
@@ -107,116 +276,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
         LOGGER.error(ex.getLocalizedMessage());
         return new ApiError(localizedErrorMessage, "400");
     }
-//
+
     /**
-     * Method for handling IllegalArgumentException exceptions
+     * Method for handling null pointer exceptions
      *
      * @param ex is object with exception description
      * @return ApiError object
-     * @see MethodArgumentTypeMismatchException
+     * @see NullPointerException
      * @see ApiError
      */
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+    public ApiError handleNullPointer(NullPointerException ex) {
         String localizedErrorMessage;
-        localizedErrorMessage = String.format(translator.translateToLocale("TYPE_MISMATCH"), ex.getRequiredType());
+        localizedErrorMessage = translator.translateToLocale("NULL_POINTER");
         LOGGER.error(ex.getLocalizedMessage());
         return new ApiError(localizedErrorMessage, "400");
-    }
-
-    /**
-     * Method for handling MissingServletRequestPartException exceptions
-     *
-     * @param ex is object with exception description
-     * @return ApiError object
-     * @see MissingServletRequestPartException
-     * @see ApiError
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
-                                                                     HttpHeaders headers,
-                                                                     HttpStatus status,
-                                                                     WebRequest request) {
-        String localizedErrorMessage;
-        localizedErrorMessage = String.format(translator.
-                translateToLocale("MISSING_REQUEST_PART"), ex.getRequestPartName());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
-        LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                                                                         HttpHeaders headers, HttpStatus status,
-                                                                         WebRequest request) {
-        String localizedErrorMessage;
-        localizedErrorMessage = String.format(translator.
-                translateToLocale("METHOD_NOT_SUPPORTED"), ex.getMethod());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
-        LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Method for handling MissingServletRequestParameterException exceptions
-     *
-     * @param ex is object with exception description
-     * @return ApiError object
-     * @see MissingServletRequestParameterException
-     * @see ApiError
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          HttpHeaders headers,
-                                                                          HttpStatus status,
-                                                                          WebRequest request) {
-        String localizedErrorMessage;
-        localizedErrorMessage = String.format(translator.
-                translateToLocale("PARAMETER_MISSING"), ex.getParameterName());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
-        LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Method for handling NoHandlerFoundException exceptions
-     *
-     * @param ex is object with exception description
-     * @return ApiError object
-     * @see NoHandlerFoundException
-     * @see ApiError
-     */
-    @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(
-            NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String localizedErrorMessage;
-        localizedErrorMessage = String.format(translator.
-                translateToLocale("NO_HANDLER_FOUND"), ex.getHttpMethod() + " " + ex.getRequestURL());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
-        LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Method for handling HttpMessageNotReadableException
-     *
-     * @param ex is object with exception description
-     * @return ApiError object
-     * @see HttpMessageNotReadableException
-     * @see ApiError
-     */
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
-        String localizedErrorMessage;
-        localizedErrorMessage = translator.translateToLocale("MESSAGE_NOT_READABLE");
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
-        LOGGER.error(localizedErrorMessage);
-
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     /**

@@ -10,7 +10,6 @@ import com.epam.esm.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
+import static com.epam.esm.utils.TagSearchParameters.NAME;
 
 /**
  * Tag class with CRD methods
@@ -47,13 +47,13 @@ public class TagServiceImpl implements TagService {
         }
         List<Tag> currentTags = allTags.get();
         if (!searchParam.isEmpty()) {
-            if (searchParam.get("name") != null) {
-                tagValidator.checkTagDtoName(searchParam.get("name").trim());
+            if (searchParam.get(NAME) != null) {
+                tagValidator.checkTagDtoName(searchParam.get(NAME).trim());
                 List<Tag> filteredTags = currentTags.stream().filter(tag -> tag.getName().
-                                equals(searchParam.get("name").trim().toLowerCase()))
+                                equals(searchParam.get(NAME).trim().toLowerCase()))
                         .collect(Collectors.toList());
                 if (filteredTags.isEmpty()) {
-                    throw new ServiceException(NO_TAGS_WITH_THIS_NAME, searchParam.get("name").trim());
+                    throw new ServiceException(NO_TAGS_WITH_THIS_NAME, searchParam.get(NAME).trim());
                 }
                 return filteredTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
             }
