@@ -1,36 +1,14 @@
 package com.epam.esm.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@NoArgsConstructor
+@Setter
 public class TagDto {
 
     private long id;
     private String name;
-
-    public TagDto() {
-    }
-
-    public TagDto(String name) {
-        this.name = name;
-    }
-
-    public TagDto(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

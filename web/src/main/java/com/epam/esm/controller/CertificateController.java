@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("certificates")
+@RequestMapping("api/v1/certificates")
 public class CertificateController {
 
     private final CertificateService certificateService;
@@ -33,6 +33,12 @@ public class CertificateController {
     @ResponseStatus(HttpStatus.OK)
     public List<ResponseCertificateDto> getCertificates(@RequestParam(required = false) Map<String, String> searchParams) {
         return certificateService.getCertificates(searchParams);
+    }
+
+    @GetMapping("/tags")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ResponseCertificateDto> getCertificatesByTags(@RequestParam List<String> tag) {
+        return certificateService.getCertificatesByTags(tag);
     }
 
     /**

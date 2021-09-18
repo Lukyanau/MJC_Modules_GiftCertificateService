@@ -1,27 +1,15 @@
 package com.epam.esm.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class ResponseCertificateDto extends RequestCertificateDto {
 
     private LocalDateTime created;
     private LocalDateTime updated;
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    public LocalDateTime getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(LocalDateTime updated) {
-        this.updated = updated;
-    }
-
 
 }

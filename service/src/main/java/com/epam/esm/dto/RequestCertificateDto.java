@@ -1,8 +1,13 @@
 package com.epam.esm.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+@Getter
+@Setter
 public class RequestCertificateDto {
 
     private long id;
@@ -12,51 +17,4 @@ public class RequestCertificateDto {
     private int duration;
     private List<TagDto> tags;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public List<TagDto> getCertificateTags() {
-        return tags;
-    }
-
-    public void setCertificateTags(List<TagDto> certificateTags) {
-        this.tags = certificateTags;
-    }
 }

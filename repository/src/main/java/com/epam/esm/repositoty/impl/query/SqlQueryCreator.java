@@ -13,11 +13,9 @@ public class SqlQueryCreator {
 
 
     public static String createQueryFromSearchParameters(Map<String, String> searchParams) {
-        StringBuilder preparedQuery = new StringBuilder("SELECT id, name, description, price, duration, created, updated" +
-                " FROM gift_certificate");
+        StringBuilder preparedQuery = new StringBuilder("SELECT c FROM GiftCertificate c");
         createFromSearchParams(searchParams, preparedQuery);
         createFromSortParams(searchParams, preparedQuery);
-        preparedQuery.append(";");
         LOGGER.info("Query created: " + preparedQuery);
         return preparedQuery.toString();
     }
@@ -26,10 +24,10 @@ public class SqlQueryCreator {
         if (searchParams.containsKey(NAME) || searchParams.containsKey(DESCRIPTION)) {
             preparedQuery.append(" WHERE ");
             if (searchParams.containsKey(NAME)) {
-                preparedQuery.append(" name LIKE '%").append(searchParams.get(NAME).trim()).append("%' AND");
+                preparedQuery.append(" c.name LIKE '%").append(searchParams.get(NAME).trim()).append("%' AND");
             }
             if (searchParams.containsKey(DESCRIPTION)) {
-                preparedQuery.append(" description LIKE '%").append(searchParams.get(DESCRIPTION).trim()).append("%' ");
+                preparedQuery.append(" c.description LIKE '%").append(searchParams.get(DESCRIPTION).trim()).append("%' ");
             }
             if (preparedQuery.substring(preparedQuery.length() - 4).equalsIgnoreCase(" AND")) {
                 preparedQuery.delete(preparedQuery.length() - 3, preparedQuery.length());

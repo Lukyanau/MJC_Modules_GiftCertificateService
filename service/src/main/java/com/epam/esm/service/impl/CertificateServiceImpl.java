@@ -9,7 +9,7 @@ import com.epam.esm.mapper.CertificateMapper;
 import com.epam.esm.repositoty.CertificateRepository;
 import com.epam.esm.repositoty.TagRepository;
 import com.epam.esm.service.CertificateService;
-import com.epam.esm.service.TagService;
+import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.CertificateValidator;
 import com.epam.esm.validator.SearchParamsValidator;
 import com.epam.esm.validator.TagValidator;
@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
@@ -36,13 +35,14 @@ import static com.epam.esm.utils.CertificateSearchParameters.TAG_NAME;
 @RequiredArgsConstructor
 public class CertificateServiceImpl implements CertificateService {
 
-    private final CertificateValidator certificateValidator;
     private final CertificateRepository certificateRepository;
+    private final CertificateValidator certificateValidator;
     private final CertificateMapper certificateMapper;
-    private final TagValidator tagValidator;
-    private final TagService tagService;
-    private final TagRepository tagRepository;
     private final SearchParamsValidator searchValidator;
+    private final BaseValidator baseValidator;
+    private final TagRepository tagRepository;
+    private final TagValidator tagValidator;
+
 
     /**
      * Transactional method for adding
@@ -51,27 +51,27 @@ public class CertificateServiceImpl implements CertificateService {
      * @param certificateDto is object from request
      * @return added object
      */
-    @Transactional
     @Override
     public ResponseCertificateDto addCertificate(RequestCertificateDto certificateDto) {
         certificateValidator.validateCertificateDto(certificateDto);
+        certificateDto.setName(certificateDto.getName().trim().toLowerCase());
         GiftCertificate currentCertificate = certificateMapper.convertToEntity(certificateDto);
         setCertificateDateTime(currentCertificate);
-        GiftCertificate addedCertificate = certificateRepository.add(currentCertificate);
-        addedCertificate.setId(certificateRepository.getCertificateIdByName(addedCertificate.getName().trim()));
-        if (addedCertificate.getCertificateTags() == null) {
-            return certificateMapper.convertToDto(addedCertificate);
+        if (currentCertificate.getTags() == null) {
+            ResponseCertificateDto certificateWithoutTags = certificateMapper.
+                    convertToDto(certificateRepository.add(currentCertificate));
+            certificateWithoutTags.setId(certificateRepository.getCertificateIdByName(certificateWithoutTags.getName()));
+            return certificateWithoutTags;
         }
-        addedCertificate.getCertificateTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
-        addedCertificate.setCertificateTags(currentCertificate.getCertificateTags().
+        currentCertificate.getTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
+        currentCertificate.setTags(currentCertificate.getTags().
                 stream().distinct().collect(Collectors.toList()));
-        addedCertificate.getCertificateTags().forEach(tag -> tagValidator.checkTagDtoName(tag.getName()));
-        addedCertificate.getCertificateTags().forEach(tag -> {
-            updateCertificateTag(tag);
-            tag.setId(tagRepository.getTagId(tag.getName().trim().toLowerCase()));
-            certificateRepository.addCertificateAndTagIds(addedCertificate.getId(), tag.getId());
-        });
-        return certificateMapper.convertToDto(addedCertificate);
+        currentCertificate.getTags().forEach(tag -> tagValidator.checkTagDtoName(tag.getName()));
+        currentCertificate.getTags().forEach(this::updateCertificateTag);
+        ResponseCertificateDto addedResponseCertificate = certificateMapper.
+                convertToDto(certificateRepository.add(currentCertificate));
+        addedResponseCertificate.setId(certificateRepository.getCertificateIdByName(addedResponseCertificate.getName()));
+        return addedResponseCertificate;
     }
 
     /**
@@ -88,14 +88,25 @@ public class CertificateServiceImpl implements CertificateService {
             throw new ServiceException(NOT_FOUND_CERTIFICATES);
         }
         List<GiftCertificate> currentCertificates = allCertificates.get();
-        currentCertificates.forEach(certificate -> certificate.setCertificateTags
-                (tagService.getTagsByCertificateId(certificate.getId())));
         if (searchParams.containsKey(TAG_NAME)) {
             List<GiftCertificate> filteredCertificate = getCertificatesByTag(currentCertificates,
                     searchParams.get(TAG_NAME).trim().toLowerCase());
             return filteredCertificate.stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
         }
         return currentCertificates.stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ResponseCertificateDto> getCertificatesByTags(List<String> tags) {
+        tags.forEach(tagValidator::checkTagDtoName);
+        Optional<List<GiftCertificate>> allCertificates = certificateRepository.getAll(Collections.emptyMap());
+        if (allCertificates.isEmpty()) {
+            throw new ServiceException(NOT_FOUND_CERTIFICATES);
+        }
+        List<GiftCertificate> currentCertificates = allCertificates.get();
+        AtomicReference<List<GiftCertificate>> filteredCertificates = new AtomicReference<>(currentCertificates);
+        tags.forEach(tag -> filteredCertificates.set(getCertificatesByTag(currentCertificates, tag.trim().toLowerCase())));
+        return filteredCertificates.get().stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
     }
 
     /**
@@ -106,13 +117,12 @@ public class CertificateServiceImpl implements CertificateService {
      */
     @Override
     public ResponseCertificateDto getCertificateById(long id) {
-        certificateValidator.checkCertificateDtoId(id);
+        baseValidator.checkId(id);
         Optional<GiftCertificate> giftCertificate = certificateRepository.getById(id);
         if (giftCertificate.isEmpty()) {
             throw new ServiceException(CERTIFICATE_WITH_ID_NOT_FOUND, String.valueOf(id));
         }
         GiftCertificate currentCertificate = giftCertificate.get();
-        currentCertificate.setCertificateTags(tagService.getTagsByCertificateId(currentCertificate.getId()));
         return certificateMapper.convertToDto(currentCertificate);
     }
 
@@ -123,10 +133,9 @@ public class CertificateServiceImpl implements CertificateService {
      * @param certificateDto is object from request
      * @return updated object
      */
-    @Transactional
     @Override
     public ResponseCertificateDto updateCertificate(long id, RequestCertificateDto certificateDto) {
-        certificateValidator.checkCertificateDtoId(id);
+        baseValidator.checkId(id);
         certificateValidator.validateCertificateDto(certificateDto);
         Optional<GiftCertificate> foundedCertificate = certificateRepository.getById(id);
         if (foundedCertificate.isEmpty()) {
@@ -136,12 +145,12 @@ public class CertificateServiceImpl implements CertificateService {
         preUpdatedCertificate.setId(foundedCertificate.get().getId());
         preUpdatedCertificate.setCreated(foundedCertificate.get().getCreated());
         preUpdatedCertificate.setUpdated(LocalDateTime.now());
-        if (preUpdatedCertificate.getCertificateTags() == null ||
-                preUpdatedCertificate.getCertificateTags().size() == 0) {
+        if (preUpdatedCertificate.getTags() == null ||
+                preUpdatedCertificate.getTags().size() == 0) {
             return certificateWithoutTagsUpdate(preUpdatedCertificate);
         }
-        preUpdatedCertificate.getCertificateTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
-        preUpdatedCertificate.setCertificateTags(preUpdatedCertificate.getCertificateTags().
+        preUpdatedCertificate.getTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
+        preUpdatedCertificate.setTags(preUpdatedCertificate.getTags().
                 stream().distinct().collect(Collectors.toList()));
         return certificateWithTagsUpdate(preUpdatedCertificate);
     }
@@ -155,7 +164,7 @@ public class CertificateServiceImpl implements CertificateService {
      */
     @Override
     public ResponseCertificateDto patchUpdateCertificate(long id, RequestCertificateDto preUpdatedCertificate) {
-        certificateValidator.checkCertificateDtoId(id);
+        baseValidator.checkId(id);
         Optional<GiftCertificate> giftCertificate = certificateRepository.getById(id);
         if (giftCertificate.isEmpty()) {
             throw new ServiceException(NOT_UPDATE_CERTIFICATE, String.valueOf(id));
@@ -166,14 +175,13 @@ public class CertificateServiceImpl implements CertificateService {
         GiftCertificate checkedPreUpdatedCertificate = certificateMapper.convertToEntity(preUpdatedCertificate);
         checkedPreUpdatedCertificate.setCreated(giftCertificate.get().getCreated());
         checkedPreUpdatedCertificate.setUpdated(LocalDateTime.now());
-        if (checkedPreUpdatedCertificate.getCertificateTags() == null) {
-            checkedPreUpdatedCertificate.setCertificateTags(
-                    tagService.getTagsByCertificateId(checkedPreUpdatedCertificate.getId()));
+        if (checkedPreUpdatedCertificate.getTags() == null) {
+            checkedPreUpdatedCertificate.setTags(giftCertificate.get().getTags());
             certificateRepository.updateCertificate(id, checkedPreUpdatedCertificate);
-            return certificateMapper.convertToDto(checkedPreUpdatedCertificate);
+            return certificateMapper.convertToDto(certificateRepository.getById(id).get());
         }
-        checkedPreUpdatedCertificate.getCertificateTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
-        checkedPreUpdatedCertificate.setCertificateTags(checkedPreUpdatedCertificate.getCertificateTags().
+        checkedPreUpdatedCertificate.getTags().forEach(tag -> tag.setName(tag.getName().trim().toLowerCase()));
+        checkedPreUpdatedCertificate.setTags(checkedPreUpdatedCertificate.getTags().
                 stream().distinct().collect(Collectors.toList()));
         return certificateWithTagsUpdate(checkedPreUpdatedCertificate);
     }
@@ -186,47 +194,30 @@ public class CertificateServiceImpl implements CertificateService {
      */
     @Override
     public boolean deleteCertificateById(long id) {
-        certificateValidator.checkCertificateDtoId(id);
+        baseValidator.checkId(id);
         if (!(certificateRepository.delete(id) > 0)) {
             throw new ServiceException(NOT_DELETE_CERTIFICATE, String.valueOf(id));
         }
         return certificateRepository.delete(id) > 0;
     }
 
+
     private ResponseCertificateDto certificateWithoutTagsUpdate(GiftCertificate certificate) {
-        List<Tag> tagsToDelete = tagService.getTagsByCertificateId(certificate.getId());
-        tagsToDelete.forEach(tag -> tagService.deleteFromCrossTable(tag.getId(), certificate.getId()));
         certificateRepository.updateCertificate(certificate.getId(), certificate);
         return certificateMapper.convertToDto(certificate);
     }
 
+
     private ResponseCertificateDto certificateWithTagsUpdate(GiftCertificate certificate) {
-        certificate.getCertificateTags().forEach(tag -> tagValidator.checkTagDtoName(tag.getName()));
+        certificate.getTags().forEach(tag -> tagValidator.checkTagDtoName(tag.getName()));
+        certificate.getTags().forEach(this::updateCertificateTag);
         certificateRepository.updateCertificate(certificate.getId(), certificate);
-        certificate.getCertificateTags().forEach(tag -> {
-            if (tagRepository.getByName(tag.getName()).isPresent()) {
-                tag.setId(tagRepository.getTagId(tag.getName()));
-            }
-        });
-        List<Tag> currentTags = tagService.getTagsByCertificateId(certificate.getId());
-        currentTags.forEach(tag -> {
-            if (!certificate.getCertificateTags().contains(tag)) {
-                tagService.deleteFromCrossTable(tag.getId(), certificate.getId());
-            }
-        });
-        List<Tag> remainingTags = tagService.getTagsByCertificateId(certificate.getId());
-        certificate.getCertificateTags().forEach(tag -> {
-            if (!remainingTags.contains(tag)) {
-                updateCertificateTag(tag);
-                certificateRepository.addCertificateAndTagIds(certificate.getId(), tag.getId());
-            }
-        });
-        return certificateMapper.convertToDto(certificate);
+        return certificateMapper.convertToDto(certificateRepository.getById(certificate.getId()).get());
     }
 
     private List<GiftCertificate> getCertificatesByTag(List<GiftCertificate> allCertificates, String tagName) {
         return allCertificates.stream().filter(certificate -> verificationCertificateTags
-                (certificate.getCertificateTags(), tagName)).collect(Collectors.toList());
+                (certificate.getTags(), tagName)).collect(Collectors.toList());
     }
 
     private boolean verificationCertificateTags(List<Tag> certificateTags, String tagName) {
@@ -235,11 +226,12 @@ public class CertificateServiceImpl implements CertificateService {
         return !checkedTags.isEmpty();
     }
 
-    private void updateCertificateTag(Tag certificateTag) {
-        if (tagRepository.getByName(certificateTag.getName().trim().toLowerCase()).isEmpty()) {
+    @Transactional
+    void updateCertificateTag(Tag certificateTag) {
+        if (tagRepository.getByName(certificateTag.getName()).isEmpty()) {
             tagRepository.add(certificateTag);
-            certificateTag.setId(tagRepository.getTagId(certificateTag.getName().trim().toLowerCase()));
         }
+        certificateTag.setId(tagRepository.getTagId(certificateTag.getName()));
     }
 
     private void setCertificateDateTime(GiftCertificate addedCertificate) {
@@ -262,5 +254,4 @@ public class CertificateServiceImpl implements CertificateService {
             preUpdatedCertificate.setDuration(giftCertificate.getDuration());
         }
     }
-
 }

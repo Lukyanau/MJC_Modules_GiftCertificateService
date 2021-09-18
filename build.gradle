@@ -1,31 +1,40 @@
 plugins {
-    id 'war'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
 group 'com.epam.esm'
 version '1.0'
 
+
+springBoot {
+    mainClassName('com.epam.esm.app.Application')
+}
+
 allprojects {
     apply plugin: 'java'
     ext {
-        springVersion = '5.3.8'
         log4jVersion = '2.12.1'
+        lombokVersion = '1.18.20'
+        bootStarterVersion = '2.5.4'
     }
     repositories {
         mavenCentral()
     }
     dependencies {
-        compileOnly 'org.projectlombok:lombok:1.18.20'
-        annotationProcessor 'org.projectlombok:lombok:1.18.20'
-        testCompileOnly 'org.projectlombok:lombok:1.18.20'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-        implementation "org.springframework:spring-core:${springVersion}"
-        implementation "org.springframework:spring-context:${springVersion}"
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
         implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
         implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
-        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
 
+        implementation "org.springframework.boot:spring-boot-starter-web:${bootStarterVersion}"
+        implementation "org.springframework.boot:spring-boot-starter-data-jpa:${bootStarterVersion}"
+        implementation "org.springframework.boot:spring-boot-starter-hateoas:${bootStarterVersion}"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:${bootStarterVersion}"
     }
 }
 

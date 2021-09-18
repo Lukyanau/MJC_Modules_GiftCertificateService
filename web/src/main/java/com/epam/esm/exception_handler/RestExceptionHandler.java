@@ -23,6 +23,9 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class that handle all exception
  * in program
@@ -52,8 +55,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String localizedErrorMessage;
         if (ex.getErrorReason() != null) {
             localizedErrorMessage = String.format(translator.translateToLocale(ex.getErrorCode()), ex.getErrorReason());
-        } else {
+        } else if (ex.getErrorCodes().isEmpty()) {
             localizedErrorMessage = translator.translateToLocale(ex.getErrorCode());
+        } else {
+            StringBuilder stringBuilder = new StringBuilder();
+            List<String> errorCodes = new ArrayList<>();
+            ex.getErrorCodes().forEach(code -> {
+                stringBuilder.append(translator.translateToLocale(code.getErrorCode()));
+                errorCodes.add(code.getErrorCode());
+            });
+            System.out.println(stringBuilder);
+            localizedErrorMessage = String.valueOf(stringBuilder);
+            return new ApiError(localizedErrorMessage, String.valueOf(errorCodes));
         }
         LOGGER.error(localizedErrorMessage);
         return new ApiError(localizedErrorMessage, ex.getErrorCode());
@@ -109,9 +122,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String localizedErrorMessage;
         localizedErrorMessage = String.format(translator.
                 translateToLocale("MEDIA_TYPE_NOT_SUPPORTED"), ex.getSupportedMediaTypes());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        ApiError apiError = new ApiError(localizedErrorMessage, "415");
         LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
     /**
@@ -130,9 +143,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String localizedErrorMessage;
         localizedErrorMessage = String.format(translator.
                 translateToLocale("MEDIA_TYPE_NOT_ACCEPTABLE"), ex.getSupportedMediaTypes());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        ApiError apiError = new ApiError(localizedErrorMessage, "406");
         LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     /**
@@ -219,9 +232,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String localizedErrorMessage;
         localizedErrorMessage = String.format(translator.
                 translateToLocale("METHOD_NOT_SUPPORTED"), ex.getMethod());
-        ApiError apiError = new ApiError(localizedErrorMessage, "400");
+        ApiError apiError = new ApiError(localizedErrorMessage, "405");
         LOGGER.error(localizedErrorMessage);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     /**

@@ -1,68 +1,67 @@
 package com.epam.esm.repositoty.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.repositoty.impl.query.SqlQuery;
 import com.epam.esm.repositoty.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.epam.esm.repositoty.impl.query.NewSqlQuery.*;
 
 @Repository
 @RequiredArgsConstructor
 public class TagRepositoryImpl implements TagRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+    private final EntityManager entityManager;
 
     @Override
+    @Transactional
     public Tag add(Tag tag) {
-        jdbcTemplate.update(SqlQuery.ADD_TAG, tag.getName().trim().toLowerCase());
+        entityManager.merge(tag);
         return tag;
     }
 
     @Override
     public Optional<Tag> getById(long id) {
-        return jdbcTemplate.query(SqlQuery.GET_TAG_BY_ID, new BeanPropertyRowMapper<>(Tag.class), id)
-                .stream().findAny();
+        return Optional.ofNullable(entityManager.find(Tag.class, id));
+
     }
 
     @Override
     public Optional<Tag> getByName(String name) {
-        return jdbcTemplate.query(SqlQuery.GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class),
-                        name.trim().toLowerCase()).stream().findAny();
+        TypedQuery<Tag> query = entityManager.createQuery(GET_TAG_BY_NAME, Tag.class);
+        return query.setParameter("name", name).getResultList().stream().findFirst();
     }
 
     @Override
     public Long getTagId(String tagName) {
-        return jdbcTemplate.queryForObject(SqlQuery.GET_TAG_ID, Long.class, tagName);
+        TypedQuery<Long> query = entityManager.createQuery(GET_TAG_ID_BY_NAME, Long.class);
+        return query.setParameter("name", tagName).getSingleResult();
     }
 
     @Override
-    public Optional<List<Tag>> getAll(Map<String,String> searchParams) {
-        return Optional.of(jdbcTemplate.query(SqlQuery.GET_ALL_TAGS, new BeanPropertyRowMapper<>(Tag.class)));
+    public Optional<List<Tag>> getAll(Map<String, String> searchParams) {
+        return Optional.ofNullable(entityManager.createQuery(SELECT_ALL_TAGS, Tag.class).getResultList());
     }
 
     @Override
-    public Optional<List<Long>> getTagsIdsByCertificateId(long id) {
-        return Optional.of(jdbcTemplate.queryForList(SqlQuery.GET_TAGS_BY_CERTIFICATE_ID, Long.class, id));
-    }
-
-    @Override
+    @Transactional
     public int delete(long id) {
-        return jdbcTemplate.update(SqlQuery.DELETE_TAG_BY_ID, id);
+        Query query = entityManager.createQuery(DELETE_TAG_BY_ID);
+        return query.setParameter("id", id).executeUpdate();
     }
 
     @Override
+    @Transactional
     public Long checkUsedTags(long id) {
-        return jdbcTemplate.queryForObject(SqlQuery.CHECK_USED_TAGS, Long.class, id);
-    }
-
-    @Override
-    public void deleteFromCrossTable(long tagId, long certificateId) {
-        jdbcTemplate.update(SqlQuery.DELETE_FROM_CROSS_TABLE, tagId, certificateId);
+        Query query = entityManager.createNativeQuery(CHECK_USED_TAGS);
+        query.setParameter("id", id);
+        return Long.valueOf(String.valueOf(query.getResultList().get(0)));
     }
 }

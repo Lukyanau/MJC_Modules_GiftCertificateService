@@ -6,6 +6,7 @@ import com.epam.esm.repositoty.impl.CertificateRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
+@SpringBootTest
 @ContextConfiguration(classes = TestRepositoryConfiguration.class)
 @ActiveProfiles("dev")
 public class CertificateRepositoryTest {
@@ -78,7 +79,7 @@ public class CertificateRepositoryTest {
                 .of(2020, 9, 12, 15, 0, 0));
         expectedGiftCertificate.setUpdated(LocalDateTime
                 .of(2021, 1, 1, 17, 0, 0));
-        expectedGiftCertificate.setCertificateTags(new ArrayList<>());
+        expectedGiftCertificate.setTags(new ArrayList<>());
 
         GiftCertificate actualGiftCertificate = certificateRepository.add(expectedGiftCertificate);
 
@@ -96,7 +97,7 @@ public class CertificateRepositoryTest {
                 .of(2020, 9, 12, 15, 0, 0));
         expectedGiftCertificate.setUpdated(LocalDateTime
                 .of(2021, 1, 1, 17, 0, 0));
-        expectedGiftCertificate.setCertificateTags(new ArrayList<>());
+        expectedGiftCertificate.setTags(new ArrayList<>());
 
         assertThrows(DataIntegrityViolationException.class, () -> certificateRepository.add(expectedGiftCertificate));
     }
@@ -113,7 +114,7 @@ public class CertificateRepositoryTest {
                 .of(2020, 9, 12, 15, 0, 0));
         giftCertificate.setUpdated(LocalDateTime
                 .of(2021, 1, 1, 17, 0, 0));
-        giftCertificate.setCertificateTags(new ArrayList<>());
+        giftCertificate.setTags(new ArrayList<>());
 
         GiftCertificate expectedGiftCertificate = new GiftCertificate();
         expectedGiftCertificate.setId(4L);
@@ -125,7 +126,7 @@ public class CertificateRepositoryTest {
                 .of(2020, 9, 12, 15, 0, 0));
         expectedGiftCertificate.setUpdated(LocalDateTime
                 .of(2021, 1, 1, 17, 0, 0));
-        expectedGiftCertificate.setCertificateTags(new ArrayList<>());
+        expectedGiftCertificate.setTags(new ArrayList<>());
 
         assertDoesNotThrow(() -> certificateRepository.updateCertificate(4L,giftCertificate));
     }
@@ -133,7 +134,7 @@ public class CertificateRepositoryTest {
     @Test
     void updateIncorrectDataShouldThrowException() {
         GiftCertificate giftCertificate = new GiftCertificate();
-        giftCertificate.setId(1);
+        giftCertificate.setId(1L);
         giftCertificate.setName("New certificate name incorrect because its can be less than 45 symbols USA ATALANTA");
         giftCertificate.setDescription("Spend money");
         giftCertificate.setPrice(new BigDecimal("175"));
@@ -142,7 +143,7 @@ public class CertificateRepositoryTest {
                 .of(2020, 9, 12, 15, 0, 0));
         giftCertificate.setUpdated(LocalDateTime
                 .of(2021, 1, 1, 17, 0, 0));
-        giftCertificate.setCertificateTags(new ArrayList<>());
+        giftCertificate.setTags(new ArrayList<>());
 
         assertThrows(DataIntegrityViolationException.class, () -> certificateRepository.updateCertificate(1, giftCertificate));
     }

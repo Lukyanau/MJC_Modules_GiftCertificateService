@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface CertificateService {
+
     List<ResponseCertificateDto> getCertificates(Map<String, String> searchParams);
+    List<ResponseCertificateDto> getCertificatesByTags(List<String> tags);
     ResponseCertificateDto getCertificateById(long id);
     ResponseCertificateDto addCertificate(RequestCertificateDto certificateDTO);
     ResponseCertificateDto updateCertificate(long id, RequestCertificateDto certificateDTO);

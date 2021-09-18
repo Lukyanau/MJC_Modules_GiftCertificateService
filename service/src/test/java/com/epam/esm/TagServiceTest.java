@@ -7,21 +7,25 @@ import com.epam.esm.mapper.TagMapper;
 import com.epam.esm.repositoty.TagRepository;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.TagServiceImpl;
+import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest(classes = TagServiceTest.class)
 public class TagServiceTest {
 
     private TagRepository tagRepository;
     private TagMapper tagMapper;
     private TagValidator tagValidator;
+    private BaseValidator baseValidator;
     private TagService tagService;
 
     @BeforeEach
@@ -29,7 +33,8 @@ public class TagServiceTest {
         tagRepository = mock(TagRepository.class);
         tagMapper = mock(TagMapper.class);
         tagValidator = new TagValidator();
-        tagService = new TagServiceImpl(tagRepository, tagMapper, tagValidator);
+        baseValidator = new BaseValidator();
+        tagService = new TagServiceImpl(tagRepository, tagMapper, tagValidator, baseValidator);
 
     }
 
@@ -38,16 +43,17 @@ public class TagServiceTest {
         tagRepository = null;
         tagMapper = null;
         tagValidator = null;
+        baseValidator = null;
         tagService = null;
     }
 
     @Test
     void getTagsCorrectDataShouldReturnListWithTagDto() {
         Tag tag1 = new Tag();
-        tag1.setId(1);
+        tag1.setId(1L);
         tag1.setName("gilly");
         Tag tag2 = new Tag();
-        tag1.setId(2);
+        tag1.setId(2L);
         tag1.setName("ford");
         when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of(List.of(tag1, tag2)));
         when(tagMapper.convertToDto(any(Tag.class))).thenReturn(any(TagDto.class));
@@ -65,7 +71,7 @@ public class TagServiceTest {
     @Test
     void getTagByIdCorrectIdShouldReturnTagDto() {
         Tag tag1 = new Tag();
-        tag1.setId(1);
+        tag1.setId(1L);
         tag1.setName("gilly");
         TagDto expectedTagDto = new TagDto();
         expectedTagDto.setId(1);
@@ -127,29 +133,5 @@ public class TagServiceTest {
         long correctId = 10;
         when(tagRepository.checkUsedTags(anyLong())).thenReturn(1L);
         assertThrows(ServiceException.class, () -> tagService.deleteTagById(correctId));
-    }
-
-    @Test
-    void getTagsByCertificateIdShouldReturnLongList() {
-        long certificateId = 10;
-        Optional<Tag> tag1 = Optional.of(new Tag("firstTag"));
-        Optional<Tag> tag2 = Optional.of(new Tag("secondTag"));
-        Optional<Tag> tag3 = Optional.of(new Tag("thirdTag"));
-        List<Tag> expectedTagList = Arrays.asList(tag1.get(), tag2.get(), tag3.get());
-        when(tagRepository.getTagsIdsByCertificateId(certificateId)).thenReturn(Optional.of(Arrays.asList(1L, 2L, 3L)));
-        when(tagRepository.getById(1)).thenReturn(tag1);
-        when(tagRepository.getById(2)).thenReturn(tag2);
-        when(tagRepository.getById(3)).thenReturn(tag3);
-        List<Tag> actualTagList = tagService.getTagsByCertificateId(certificateId);
-        assertEquals(expectedTagList, actualTagList);
-    }
-
-    @Test
-    void getTagsByCertificateIdShouldReturnEmptyList() {
-        long correctCertificateId = 10;
-        when(tagRepository.getTagsIdsByCertificateId(correctCertificateId)).thenReturn(Optional.empty());
-        List<Tag> expectedTagList = Collections.emptyList();
-        List<Tag> actualTagList = tagService.getTagsByCertificateId(correctCertificateId);
-        assertEquals(expectedTagList, actualTagList);
     }
 }

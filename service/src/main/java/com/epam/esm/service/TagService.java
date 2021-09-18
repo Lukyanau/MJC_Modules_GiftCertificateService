@@ -10,6 +10,4 @@ public interface TagService {
     TagDto getTagById(long id);
     TagDto addTag(TagDto tagDTO);
     boolean deleteTagById(long id);
-    List<Tag> getTagsByCertificateId(long id);
-    void deleteFromCrossTable(long tagId, long certificateId);
 }

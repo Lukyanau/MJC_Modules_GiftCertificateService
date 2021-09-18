@@ -2,9 +2,12 @@ package com.epam.esm.validator;
 
 import com.epam.esm.dto.RequestCertificateDto;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.exception.exception_code.ExceptionDescription;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
@@ -29,52 +32,57 @@ public class CertificateValidator {
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDto(RequestCertificateDto certificateDto) {
-        checkCertificateDtoName(certificateDto.getName());
-        checkCertificateDtoDescription(certificateDto.getDescription());
-        checkCertificateDtoPrice(certificateDto.getPrice());
-        checkCertificateDtoDuration(certificateDto.getDuration());
-    }
-
-    public void checkCertificateDtoId(Long id) {
-        if (id == null || !id.toString().matches(ID_REGEX) || id < MIN_CERTIFICATE_ID) {
-            throw new ServiceException(INVALID_CERTIFICATE_ID, String.valueOf(id));
+        List<ExceptionDescription> errorCodes = new ArrayList<>();
+        //List<error>
+        if (!checkCertificateDtoName(certificateDto.getName())) {
+            errorCodes.add(INVALID_CERTIFICATE_NAME);
         }
-    }
-
-    public void checkCertificateDtoName(String name) {
-        if (isEmptyOrNull(name) || !name.trim().matches(NAME_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_NAME );
+        if (!checkCertificateDtoDescription(certificateDto.getDescription())) {
+            errorCodes.add(INVALID_CERTIFICATE_DESCRIPTION);
         }
-    }
-
-    public void checkCertificateDtoDescription(String description) {
-        if (isEmptyOrNull(description) || !description.trim().matches(DESCRIPTION_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_DESCRIPTION);
+        if (checkCertificateDtoPrice(certificateDto.getPrice()) != null) {
+            errorCodes.add(checkCertificateDtoPrice(certificateDto.getPrice()));
         }
+        if (checkCertificateDtoDuration(certificateDto.getDuration()) != null) {
+            errorCodes.add(INVALID_CERTIFICATE_DURATION);
+        }
+        if(!errorCodes.isEmpty()){
+            throw new ServiceException(errorCodes);
+        }//map is not empty throw ServiceException
     }
 
-    public void checkCertificateDtoPrice(BigDecimal price) {
+    private boolean checkCertificateDtoName(String name) {
+        return !isEmptyOrNull(name) && name.trim().matches(NAME_REGEX);
+    }
+
+    private boolean checkCertificateDtoDescription(String description) {
+        return !isEmptyOrNull(description) && description.trim().matches(DESCRIPTION_REGEX);
+    }
+
+    private ExceptionDescription checkCertificateDtoPrice(BigDecimal price) {
         String strPrice = String.valueOf(price);
         if (isEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
-            throw new ServiceException(INVALID_CERTIFICATE_PRICE, String.valueOf(price));
+            return INVALID_CERTIFICATE_PRICE;
         }
         int certificatePrice = price.intValue();
         if (!(MIN_CERTIFICATE_PRICE <= certificatePrice && certificatePrice <= MAX_CERTIFICATE_PRICE)) {
-            throw new ServiceException(WRONG_CERTIFICATE_PRICE_RANGE);
+            return WRONG_CERTIFICATE_PRICE_RANGE;
         }
+        return null;
     }
 
-    public void checkCertificateDtoDuration(int duration) {
+    private ExceptionDescription checkCertificateDtoDuration(int duration) {
         String strDuration = String.valueOf(duration);
         if (isEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX) || duration == 0) {
-            throw new ServiceException(INVALID_CERTIFICATE_DURATION, String.valueOf(duration));
+            return INVALID_CERTIFICATE_DURATION;
         }
         if (!(MIN_CERTIFICATE_DURATION <= duration && duration <= MAX_CERTIFICATE_DURATION)) {
-            throw new ServiceException(WRONG_CERTIFICATE_DURATION_RANGE);
+            return WRONG_CERTIFICATE_DURATION_RANGE;
         }
+        return null;
     }
 
-    private static boolean isEmptyOrNull(String str) {
+    private boolean isEmptyOrNull(String str) {
         return str == null || str.isEmpty();
     }
 }

@@ -2,6 +2,8 @@ package com.epam.esm.exception;
 
 import com.epam.esm.exception.exception_code.ExceptionDescription;
 
+import java.util.List;
+
 /**
  * Custom exception class for
  * service and validators
@@ -12,10 +14,16 @@ public class ServiceException extends RuntimeException {
 
     private String errorCode;
     private String errorReason;
+    private List<ExceptionDescription> errorCodes;
 
     public ServiceException(ExceptionDescription exceptionDescription) {
         super();
         this.errorCode = exceptionDescription.getErrorCode();
+    }
+
+    public ServiceException(List<ExceptionDescription> errorCodes) {
+        super();
+        this.errorCodes = errorCodes;
     }
 
     public ServiceException(ExceptionDescription exceptionDescription, String errorReason) {
@@ -32,9 +40,15 @@ public class ServiceException extends RuntimeException {
         return errorReason;
     }
 
+    public List<ExceptionDescription> getErrorCodes() {
+        return errorCodes;
+    }
+
     @Override
     public String toString() {
-        return "errorCode=" + errorCode + '\n' +
-                "reason=" + errorReason;
+        return "ServiceException" +
+                "errorCode='" + errorCode + '\'' +
+                ", errorReason='" + errorReason + '\'' +
+                ", errorCodes=" + errorCodes + super.toString();
     }
 }

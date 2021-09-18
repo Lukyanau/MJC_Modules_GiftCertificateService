@@ -10,12 +10,14 @@ import com.epam.esm.repositoty.TagRepository;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.CertificateServiceImpl;
+import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.CertificateValidator;
 import com.epam.esm.validator.SearchParamsValidator;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,27 +30,29 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest(classes = CertificateServiceTest.class)
 public class CertificateServiceTest {
+
     private CertificateRepository certificateRepository;
     private CertificateValidator certificateValidator;
     private CertificateMapper certificateMapper;
-    private CertificateService certificateService;
-    private TagService tagService;
-    private TagValidator tagValidator;
+    private SearchParamsValidator searchValidator;
+    private BaseValidator baseValidator;
     private TagRepository tagRepository;
-    private SearchParamsValidator searchParamsValidator;
+    private TagValidator tagValidator;
+    private CertificateService certificateService;
 
     @BeforeEach
     void setUp() {
         certificateRepository = mock(CertificateRepository.class);
         certificateValidator = new CertificateValidator();
-        tagService = mock(TagService.class);
         tagValidator = new TagValidator();
         tagRepository = mock(TagRepository.class);
         certificateMapper = mock(CertificateMapper.class);
-        searchParamsValidator = mock(SearchParamsValidator.class);
-        certificateService = new CertificateServiceImpl(certificateValidator, certificateRepository, certificateMapper,
-                tagValidator, tagService, tagRepository, searchParamsValidator) {
+        searchValidator = mock(SearchParamsValidator.class);
+        baseValidator = new BaseValidator();
+        certificateService = new CertificateServiceImpl(certificateRepository, certificateValidator,
+                certificateMapper, searchValidator, baseValidator , tagRepository, tagValidator) {
         };
     }
 
@@ -56,7 +60,6 @@ public class CertificateServiceTest {
     void tearDown() {
         certificateRepository = null;
         certificateValidator = null;
-        tagService = null;
         tagValidator = null;
         tagRepository = null;
         certificateMapper = null;
@@ -71,17 +74,16 @@ public class CertificateServiceTest {
         giftCertificate1.setDescription("Cafe certificate");
         giftCertificate1.setPrice(BigDecimal.valueOf(1000));
         giftCertificate1.setDuration(90);
-        giftCertificate1.setCertificateTags(new ArrayList<>());
+        giftCertificate1.setTags(new ArrayList<>());
         GiftCertificate giftCertificate2 = new GiftCertificate();
         giftCertificate2.setId(12L);
         giftCertificate2.setName("SecondCertificate");
         giftCertificate2.setDescription("Gym certificate");
         giftCertificate2.setPrice(BigDecimal.valueOf(1500));
         giftCertificate2.setDuration(30);
-        giftCertificate2.setCertificateTags(new ArrayList<>());
+        giftCertificate2.setTags(new ArrayList<>());
         when(certificateRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of
                 (Arrays.asList(giftCertificate1, giftCertificate2)));
-        when(tagService.getTagsByCertificateId(any(Long.class))).thenReturn(new ArrayList<>());
         int expectedSize = 2;
         int actualSize = certificateService.getCertificates(Collections.emptyMap()).size();
         assertEquals(expectedSize, actualSize);
@@ -90,7 +92,6 @@ public class CertificateServiceTest {
     @Test
     void findAllNoCertificatesShouldThrowException() {
         when(certificateRepository.getAll(Collections.emptyMap())).thenReturn(Optional.empty());
-        when(tagService.getTagsByCertificateId(any(Long.class))).thenReturn(new ArrayList<>());
         assertThrows(ServiceException.class, () -> certificateService.getCertificates(Collections.emptyMap()));
     }
 
@@ -102,18 +103,17 @@ public class CertificateServiceTest {
         giftCertificate1.setDescription("Cafe certificate");
         giftCertificate1.setPrice(BigDecimal.valueOf(1000));
         giftCertificate1.setDuration(90);
-        giftCertificate1.setCertificateTags(new ArrayList<>());
+        giftCertificate1.setTags(new ArrayList<>());
         ResponseCertificateDto expectedCertificate = new ResponseCertificateDto();
         expectedCertificate.setId(10L);
         expectedCertificate.setName("FirstCertificate");
         expectedCertificate.setDescription("Cafe certificate");
         expectedCertificate.setPrice(BigDecimal.valueOf(1000));
         expectedCertificate.setDuration(90);
-        expectedCertificate.setCertificateTags(new ArrayList<>());
+        expectedCertificate.setTags(new ArrayList<>());
 
         when(certificateRepository.getById(any(Long.class))).thenReturn(Optional.of(giftCertificate1));
         when(certificateMapper.convertToDto(any(GiftCertificate.class))).thenReturn(expectedCertificate);
-        when(tagService.getTagsByCertificateId(any(Long.class))).thenReturn(new ArrayList<>());
 
         ResponseCertificateDto actualCertificateDTO = certificateService.getCertificateById(10L);
 
@@ -124,12 +124,11 @@ public class CertificateServiceTest {
     void findByIdNotExistIdShouldThrowException() {
         when(certificateRepository.getById(any(Long.class))).thenReturn(Optional.empty());
         when(certificateMapper.convertToDto(any(GiftCertificate.class))).thenReturn(null);
-        when(tagService.getTagsByCertificateId(any(Long.class))).thenReturn(new ArrayList<>());
         assertThrows(ServiceException.class, () -> certificateService.getCertificateById(-1L));
     }
 
     @Test
-    void updateCertificateCorrectDataShouldReturnResponseCertificateDto(){
+    void updateCertificateCorrectDataShouldReturnResponseCertificateDto() {
         long certificateId = 10L;
         RequestCertificateDto requestCertificate = new RequestCertificateDto();
         requestCertificate.setId(10L);
@@ -137,7 +136,7 @@ public class CertificateServiceTest {
         requestCertificate.setDescription("Cafe certificate");
         requestCertificate.setPrice(BigDecimal.valueOf(1000));
         requestCertificate.setDuration(90);
-        requestCertificate.setCertificateTags(Collections.emptyList());
+        requestCertificate.setTags(Collections.emptyList());
 
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setId(10L);
@@ -147,7 +146,7 @@ public class CertificateServiceTest {
         giftCertificate.setDuration(90);
         giftCertificate.setCreated(LocalDateTime.now());
         giftCertificate.setUpdated(LocalDateTime.now());
-        giftCertificate.setCertificateTags(Collections.emptyList());
+        giftCertificate.setTags(Collections.emptyList());
 
         ResponseCertificateDto expectedCertificate = new ResponseCertificateDto();
         expectedCertificate.setId(10L);
@@ -157,12 +156,11 @@ public class CertificateServiceTest {
         expectedCertificate.setDuration(90);
         expectedCertificate.setCreated(LocalDateTime.now());
         expectedCertificate.setUpdated(LocalDateTime.now());
-        expectedCertificate.setCertificateTags(Collections.emptyList());
+        expectedCertificate.setTags(Collections.emptyList());
 
         when(certificateRepository.getById(anyLong())).thenReturn(Optional.of(giftCertificate));
         when(certificateMapper.convertToEntity(any(RequestCertificateDto.class))).thenReturn(giftCertificate);
         when(certificateRepository.getCertificateIdByName(anyString())).thenReturn(certificateId);
-        when(tagService.getTagsByCertificateId(anyLong())).thenReturn(Collections.emptyList());
         when(certificateMapper.convertToDto(any(GiftCertificate.class))).thenReturn(expectedCertificate);
         ResponseCertificateDto actualCertificate = certificateService.updateCertificate(certificateId, requestCertificate);
         assertEquals(expectedCertificate, actualCertificate);
@@ -170,7 +168,7 @@ public class CertificateServiceTest {
     }
 
     @Test
-    void updateCertificateIncorrectDataShouldThrowException(){
+    void updateCertificateIncorrectDataShouldThrowException() {
         long certificateId = -10L;
         RequestCertificateDto requestCertificate = new RequestCertificateDto();
         requestCertificate.setId(10L);
@@ -178,12 +176,12 @@ public class CertificateServiceTest {
         requestCertificate.setDescription("Cafe certificate");
         requestCertificate.setPrice(BigDecimal.valueOf(1000));
         requestCertificate.setDuration(90);
-        requestCertificate.setCertificateTags(Collections.emptyList());
-        assertThrows(ServiceException.class, ()->certificateService.updateCertificate(certificateId, requestCertificate));
+        requestCertificate.setTags(Collections.emptyList());
+        assertThrows(ServiceException.class, () -> certificateService.updateCertificate(certificateId, requestCertificate));
     }
 
     @Test
-    void deleteCertificateByIdExistsCertificateShouldReturnTrue(){
+    void deleteCertificateByIdExistsCertificateShouldReturnTrue() {
         long certificateId = 9;
         when(certificateRepository.delete(anyLong())).thenReturn(1);
         boolean actualResult = certificateService.deleteCertificateById(certificateId);
@@ -191,16 +189,16 @@ public class CertificateServiceTest {
     }
 
     @Test
-    void deleteCertificateByIdNotExistsCertificateShouldThrowException(){
+    void deleteCertificateByIdNotExistsCertificateShouldThrowException() {
         long certificateId = 9;
         when(certificateRepository.delete(anyLong())).thenReturn(0);
-        assertThrows(ServiceException.class, ()-> certificateService.deleteCertificateById(certificateId));
+        assertThrows(ServiceException.class, () -> certificateService.deleteCertificateById(certificateId));
     }
 
     @Test
-    void deleteCertificateByIdIncorrectIdCertificateShouldThrowException(){
+    void deleteCertificateByIdIncorrectIdCertificateShouldThrowException() {
         long incorrectCertificateId = -9;
         when(certificateRepository.delete(anyLong())).thenReturn(1);
-        assertThrows(ServiceException.class, ()-> certificateService.deleteCertificateById(incorrectCertificateId));
+        assertThrows(ServiceException.class, () -> certificateService.deleteCertificateById(incorrectCertificateId));
     }
 }

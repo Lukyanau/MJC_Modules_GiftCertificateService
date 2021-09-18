@@ -4,12 +4,9 @@ public class SqlQuery {
     //Certificate table
     public static final String ADD_CERTIFICATE = "INSERT INTO gift_certificate(name,description,price,duration,created,updated)" +
             " VALUES(?,?,?,?,?,?)";
-    public static final String GET_CERTIFICATE_ID = "SELECT id FROM gift_certificate WHERE name = ?";
-    public static final String GET_CERTIFICATE_BY_ID = "SELECT id, name, description, price, duration, created, updated" +
-            " FROM gift_certificate WHERE id = ?";
-    public static final String DELETE_CERTIFICATE_BY_ID = "DELETE FROM gift_certificate WHERE id = ?";
-    public static final String UPDATE_CERTIFICATE_BY_NAME = "UPDATE gift_certificate SET name = ?, description = ?, price = ?," +
-            " duration = ?, updated = ? WHERE id = ?";
+    //public static final String GET_CERTIFICATE_ID = "SELECT id FROM gift_certificate WHERE name = ?";
+//    public static final String UPDATE_CERTIFICATE_BY_NAME = "UPDATE gift_certificate SET name = ?, description = ?, price = ?," +
+//            " duration = ?, updated = ? WHERE id = ?";
 
     //Cross table
     public static final String ADD_CERTIFICATE_AND_TAG_IDS = "INSERT INTO gift_tag(gift_id, tag_id) VALUES(?,?)";

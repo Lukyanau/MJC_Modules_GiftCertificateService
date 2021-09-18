@@ -6,9 +6,11 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.TagMapper;
 import com.epam.esm.repositoty.TagRepository;
 import com.epam.esm.service.TagService;
+import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +34,7 @@ public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
     private final TagValidator tagValidator;
+    private final BaseValidator baseValidator;
 
     /**
      * Method for searching all tags
@@ -70,7 +73,7 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public TagDto getTagById(long id) {
-        tagValidator.checkTagDtoId(id);
+        baseValidator.checkId(id);
         Optional<Tag> tag = tagRepository.getById(id);
         if (tag.isEmpty()) {
             throw new ServiceException(TAG_WITH_ID_NOT_FOUND, String.valueOf(id));
@@ -87,9 +90,9 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto addTag(TagDto tagDto) {
         tagValidator.checkTagDtoName(tagDto.getName());
-        tagDto.setName(tagDto.getName());
+        tagDto.setName(tagDto.getName().trim().toLowerCase());
         if (tagRepository.getByName(tagDto.getName()).isPresent()) {
-            throw new ServiceException(NOT_ADD_TAG, tagDto.getName().trim());
+            throw new ServiceException(NOT_ADD_TAG, tagDto.getName());
         }
         Tag currentTag = tagRepository.add(tagMapper.convertToEntity(tagDto));
         currentTag.setId(tagRepository.getTagId(currentTag.getName()));
@@ -104,7 +107,7 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public boolean deleteTagById(long id) {
-        tagValidator.checkTagDtoId(id);
+        baseValidator.checkId(id);
         if (tagRepository.checkUsedTags(id) > 0) {
             throw new ServiceException(TAG_USED_IN_SOME_CERTIFICATES, String.valueOf(id));
         }
@@ -113,35 +116,4 @@ public class TagServiceImpl implements TagService {
         }
         return true;
     }
-
-    /**
-     * Method for searching all tags
-     * for a specific certificate
-     *
-     * @param id is certificate id
-     * @return list of founded tags
-     */
-    @Override
-    public List<Tag> getTagsByCertificateId(long id) {
-        Optional<List<Long>> optionalCertificateTagsIds = tagRepository.getTagsIdsByCertificateId(id);
-        if (optionalCertificateTagsIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Long> currentCertificateTagsIds = optionalCertificateTagsIds.get();
-        List<Optional<Tag>> currentTags = currentCertificateTagsIds
-                .stream().map(tagRepository::getById).collect(Collectors.toList());
-        return currentTags.stream().map(Optional::get).collect(Collectors.toList());
-    }
-
-    /**
-     * Method for deleting relations between certificate and tag
-     *
-     * @param tagId         is tag id
-     * @param certificateId is certificate id
-     */
-    @Override
-    public void deleteFromCrossTable(long tagId, long certificateId) {
-        tagRepository.deleteFromCrossTable(tagId, certificateId);
-    }
-
 }

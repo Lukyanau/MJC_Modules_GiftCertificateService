@@ -5,7 +5,6 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
 
@@ -14,7 +13,6 @@ import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
  * modelMapper bean for mapping objects
  */
 @Configuration
-@EnableTransactionManagement
 @ComponentScan("com.epam.esm.service")
 public class ServiceConfiguration {
 
