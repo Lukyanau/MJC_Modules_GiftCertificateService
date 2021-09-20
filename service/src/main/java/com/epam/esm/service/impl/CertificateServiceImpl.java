@@ -18,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -105,7 +108,8 @@ public class CertificateServiceImpl implements CertificateService {
         }
         List<GiftCertificate> currentCertificates = allCertificates.get();
         AtomicReference<List<GiftCertificate>> filteredCertificates = new AtomicReference<>(currentCertificates);
-        tags.forEach(tag -> filteredCertificates.set(getCertificatesByTag(currentCertificates, tag.trim().toLowerCase())));
+        tags.forEach(tag ->
+                filteredCertificates.set(getCertificatesByTag(filteredCertificates.get(), tag.trim().toLowerCase())));
         return filteredCertificates.get().stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
     }
 
@@ -201,6 +205,14 @@ public class CertificateServiceImpl implements CertificateService {
         return certificateRepository.delete(id) > 0;
     }
 
+    @Transactional
+    void updateCertificateTag(Tag certificateTag) {
+        if (tagRepository.getByName(certificateTag.getName()).isEmpty()) {
+            tagRepository.add(certificateTag);
+        }
+        certificateTag.setId(tagRepository.getTagId(certificateTag.getName()));
+    }
+
 
     private ResponseCertificateDto certificateWithoutTagsUpdate(GiftCertificate certificate) {
         certificateRepository.updateCertificate(certificate.getId(), certificate);
@@ -224,14 +236,6 @@ public class CertificateServiceImpl implements CertificateService {
         List<Tag> checkedTags = certificateTags.stream().filter(tag -> tag.getName().equals(tagName))
                 .collect(Collectors.toList());
         return !checkedTags.isEmpty();
-    }
-
-    @Transactional
-    void updateCertificateTag(Tag certificateTag) {
-        if (tagRepository.getByName(certificateTag.getName()).isEmpty()) {
-            tagRepository.add(certificateTag);
-        }
-        certificateTag.setId(tagRepository.getTagId(certificateTag.getName()));
     }
 
     private void setCertificateDateTime(GiftCertificate addedCertificate) {

@@ -46,7 +46,7 @@ public class CertificateValidator {
         if (checkCertificateDtoDuration(certificateDto.getDuration()) != null) {
             errorCodes.add(INVALID_CERTIFICATE_DURATION);
         }
-        if(!errorCodes.isEmpty()){
+        if (!errorCodes.isEmpty()) {
             throw new ServiceException(errorCodes);
         }//map is not empty throw ServiceException
     }

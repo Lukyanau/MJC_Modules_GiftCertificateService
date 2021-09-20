@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.epam.esm.repositoty.impl.query.NewSqlQuery.*;
+import static com.epam.esm.repositoty.impl.query.NewSqlQuery.SELECT_ALL_ORDERS;
+import static com.epam.esm.repositoty.impl.query.NewSqlQuery.SELECT_ALL_ORDERS_BY_USER_ID;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
@@ -28,9 +29,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findAllByUserId(long userId) {
-        Query query = entityManager.createQuery(SELECT_ALL_ORDERS_BY_USER_ID);
+        Query query = entityManager.createQuery(SELECT_ALL_ORDERS_BY_USER_ID, Order.class);
         return query.setParameter("userId", userId).getResultList();
-
     }
 
     @Override

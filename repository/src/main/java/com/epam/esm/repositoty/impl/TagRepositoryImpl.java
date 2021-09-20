@@ -62,6 +62,6 @@ public class TagRepositoryImpl implements TagRepository {
     public Long checkUsedTags(long id) {
         Query query = entityManager.createNativeQuery(CHECK_USED_TAGS);
         query.setParameter("id", id);
-        return Long.valueOf(String.valueOf(query.getResultList().get(0)));
+        return Long.valueOf(String.valueOf(query.getSingleResult()));
     }
 }

@@ -1,6 +1,8 @@
 package com.epam.esm.entity;
 
 import lombok.*;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 
@@ -9,10 +11,10 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @Table(name = "tag")
-public class Tag{
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +22,4 @@ public class Tag{
 
     @Column(name = "name")
     private String name;
-
 }

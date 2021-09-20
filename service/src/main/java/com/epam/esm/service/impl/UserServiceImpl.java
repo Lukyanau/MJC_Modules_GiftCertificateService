@@ -1,15 +1,19 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.OrderMapper;
+import com.epam.esm.mapper.TagMapper;
 import com.epam.esm.mapper.UserMapper;
 import com.epam.esm.repositoty.CertificateRepository;
 import com.epam.esm.repositoty.OrderRepository;
+import com.epam.esm.repositoty.TagRepository;
 import com.epam.esm.repositoty.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.utils.OrderCreator;
@@ -31,10 +35,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final OrderRepository orderRepository;
-    private final CertificateRepository certificateRepository;
-    private final BaseValidator baseValidator;
     private final OrderCreator orderCreator;
     private final OrderMapper orderMapper;
+    private final CertificateRepository certificateRepository;
+    private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
+    private final BaseValidator baseValidator;
+
 
     @Override
     public List<UserDto> getUsers() {
@@ -99,10 +106,20 @@ public class UserServiceImpl implements UserService {
         }
         Optional<Order> userOrder = userOptional.get().getOrders().stream().
                 filter(order -> order.getId() == orderId).findFirst();
-        if(userOrder.isEmpty()){
+        if (userOrder.isEmpty()) {
             throw new ServiceException(ORDER_WITH_ID_NOT_FOUND, String.valueOf(orderId));
         }
         return orderMapper.convertToDto(userOrder.get());
+    }
+
+    @Override
+    public TagDto getUserMostUsedTag() {
+        Long mostUsedTagId = userRepository.findMostUsedTagId();
+        Optional<Tag> mostUsedTag = tagRepository.getById(mostUsedTagId);
+        if (mostUsedTag.isEmpty()) {
+            throw new ServiceException(TAG_WITH_ID_NOT_FOUND, String.valueOf(mostUsedTagId));
+        }
+        return tagMapper.convertToDto(mostUsedTag.get());
     }
 
     private void checkBalanceAndPrice(BigDecimal balance, BigDecimal price) {

@@ -3,7 +3,7 @@ package com.epam.esm.validator;
 import com.epam.esm.exception.ServiceException;
 import org.springframework.stereotype.Component;
 
-import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
+import static com.epam.esm.exception.exception_code.ExceptionDescription.INVALID_ID;
 
 @Component
 public class BaseValidator {

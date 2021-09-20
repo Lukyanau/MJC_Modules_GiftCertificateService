@@ -12,4 +12,5 @@ public interface UserRepository{
     List<User> findAll();
     User findById(long id);
     void updateBalance(long userId, BigDecimal newBalance);
+    Long findMostUsedTagId();
 }

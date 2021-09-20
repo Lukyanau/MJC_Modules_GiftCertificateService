@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Web configuration with message source bean,
  * that translate exception messages.
+ *
  * @author Lukyanau I.M.
  * @version 1.0
  */
@@ -25,10 +26,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * Bean for searching exception message description
+     *
      * @return ResourceBundle
      */
     @Bean
-    public ResourceBundleMessageSource messageSource(){
+    public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
         resourceBundleMessageSource.setBasename("language.language");
         resourceBundleMessageSource.setDefaultEncoding("UTF-8");

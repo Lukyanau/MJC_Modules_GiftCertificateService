@@ -2,7 +2,6 @@ package com.epam.esm.repositoty.impl;
 
 import com.epam.esm.entity.User;
 import com.epam.esm.repositoty.UserRepository;
-import com.epam.esm.repositoty.impl.query.NewSqlQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,5 +36,10 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("balance", newBalance);
         query.setParameter("id", userId);
         query.executeUpdate();
+    }
+
+    @Override
+    public Long findMostUsedTagId() {
+        return Long.valueOf(String.valueOf(entityManager.createNativeQuery(FIND_MOST_USED_TAG_ID).getSingleResult()));
     }
 }

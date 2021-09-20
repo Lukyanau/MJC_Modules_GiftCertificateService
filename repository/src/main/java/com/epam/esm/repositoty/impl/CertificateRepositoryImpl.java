@@ -4,7 +4,6 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repositoty.CertificateRepository;
 import com.epam.esm.repositoty.impl.query.SqlQueryCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.epam.esm.repositoty.impl.query.NewSqlQuery.*;
+import static com.epam.esm.repositoty.impl.query.NewSqlQuery.DELETE_CERTIFICATE_BY_ID;
+import static com.epam.esm.repositoty.impl.query.NewSqlQuery.GET_CERTIFICATE_ID_BY_NAME;
 
 @Repository
 @RequiredArgsConstructor
