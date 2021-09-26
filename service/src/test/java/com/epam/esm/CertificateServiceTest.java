@@ -5,10 +5,9 @@ import com.epam.esm.dto.ResponseCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.CertificateMapper;
-import com.epam.esm.repositoty.CertificateRepository;
-import com.epam.esm.repositoty.TagRepository;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.CertificateService;
-import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.CertificateServiceImpl;
 import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.CertificateValidator;
@@ -33,26 +32,26 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = CertificateServiceTest.class)
 public class CertificateServiceTest {
 
-    private CertificateRepository certificateRepository;
+    private CertificateRepositoryImpl certificateRepository;
     private CertificateValidator certificateValidator;
     private CertificateMapper certificateMapper;
     private SearchParamsValidator searchValidator;
     private BaseValidator baseValidator;
-    private TagRepository tagRepository;
+    private TagRepositoryImpl tagRepository;
     private TagValidator tagValidator;
     private CertificateService certificateService;
 
     @BeforeEach
     void setUp() {
-        certificateRepository = mock(CertificateRepository.class);
+        certificateRepository = mock(CertificateRepositoryImpl.class);
         certificateValidator = new CertificateValidator();
         tagValidator = new TagValidator();
-        tagRepository = mock(TagRepository.class);
+        tagRepository = mock(TagRepositoryImpl.class);
         certificateMapper = mock(CertificateMapper.class);
         searchValidator = mock(SearchParamsValidator.class);
         baseValidator = new BaseValidator();
         certificateService = new CertificateServiceImpl(certificateRepository, certificateValidator,
-                certificateMapper, searchValidator, baseValidator , tagRepository, tagValidator) {
+                certificateMapper, searchValidator, baseValidator, tagRepository, tagValidator) {
         };
     }
 
@@ -82,17 +81,17 @@ public class CertificateServiceTest {
         giftCertificate2.setPrice(BigDecimal.valueOf(1500));
         giftCertificate2.setDuration(30);
         giftCertificate2.setTags(new ArrayList<>());
-        when(certificateRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of
+        when(certificateRepository.getAll(Collections.emptyMap(), 0, 0)).thenReturn(Optional.of
                 (Arrays.asList(giftCertificate1, giftCertificate2)));
         int expectedSize = 2;
-        int actualSize = certificateService.getCertificates(Collections.emptyMap()).size();
+        int actualSize = certificateService.getCertificates(Collections.emptyMap(), 0, 0).size();
         assertEquals(expectedSize, actualSize);
     }
 
     @Test
     void findAllNoCertificatesShouldThrowException() {
-        when(certificateRepository.getAll(Collections.emptyMap())).thenReturn(Optional.empty());
-        assertThrows(ServiceException.class, () -> certificateService.getCertificates(Collections.emptyMap()));
+        when(certificateRepository.getAll(Collections.emptyMap(), 0, 0)).thenReturn(Optional.empty());
+        assertThrows(ServiceException.class, () -> certificateService.getCertificates(Collections.emptyMap(), 0, 0));
     }
 
     @Test
@@ -183,7 +182,7 @@ public class CertificateServiceTest {
     @Test
     void deleteCertificateByIdExistsCertificateShouldReturnTrue() {
         long certificateId = 9;
-        when(certificateRepository.delete(anyLong())).thenReturn(1);
+        when(certificateRepository.delete(anyLong())).thenReturn(true);
         boolean actualResult = certificateService.deleteCertificateById(certificateId);
         assertTrue(actualResult);
     }
@@ -191,14 +190,14 @@ public class CertificateServiceTest {
     @Test
     void deleteCertificateByIdNotExistsCertificateShouldThrowException() {
         long certificateId = 9;
-        when(certificateRepository.delete(anyLong())).thenReturn(0);
+        when(certificateRepository.delete(anyLong())).thenReturn(false);
         assertThrows(ServiceException.class, () -> certificateService.deleteCertificateById(certificateId));
     }
 
     @Test
     void deleteCertificateByIdIncorrectIdCertificateShouldThrowException() {
         long incorrectCertificateId = -9;
-        when(certificateRepository.delete(anyLong())).thenReturn(1);
+        when(certificateRepository.delete(anyLong())).thenReturn(false);
         assertThrows(ServiceException.class, () -> certificateService.deleteCertificateById(incorrectCertificateId));
     }
 }

@@ -10,6 +10,8 @@ import java.util.Set;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 import static com.epam.esm.utils.CertificateSearchParameters.*;
+import static com.epam.esm.utils.Constant.*;
+import static com.epam.esm.utils.TagSearchParameters.TAG;
 
 /**
  * Validator for search params from request
@@ -23,13 +25,11 @@ public class SearchParamsValidator {
     private static final String ORDER_BY_CREATED = "created";
     private static final String SORT_ASC = "asc";
     private static final String SORT_DESC = "desc";
-    private static final String PARAMETER_REGEX = "^(.{3,50})$";
 
-
-    public void checkSearchParams(Map<String, String> searchParams) {
-        validateSearchMapKeys(searchParams.keySet());
+    public void checkCertificateSearchParams(Map<String, String> searchParams) {
+        validateCertificateSearchMapKeys(searchParams.keySet());
         searchParams.values().forEach(param -> {
-            if (isEmptyOrNull(param.trim()) || !param.trim().matches(PARAMETER_REGEX)) {
+            if (isEmptyOrNull(param.trim())) {
                 throw new ServiceException(INVALID_SEARCH_PARAMETER_VALUE);
             }
         });
@@ -47,8 +47,26 @@ public class SearchParamsValidator {
         }
     }
 
-    private void validateSearchMapKeys(Set<String> keySet) {
-        List<String> searchKeys = Arrays.asList(NAME, DESCRIPTION, ORDER_BY, SORT, TAG_NAME);
+    public void checkCertificateByTagsSearchParams(Map<String, String> searchParams) {
+        validateCertificateByTagsSearchMapKeys(searchParams.keySet());
+        searchParams.values().forEach(param -> {
+            if (isEmptyOrNull(param.trim())) {
+                throw new ServiceException(INVALID_SEARCH_PARAMETER_VALUE);
+            }
+        });
+    }
+
+    public void checkTagSearchParams(Map<String, String> searchParams) {
+        validateTagSearchMapKeys(searchParams.keySet());
+        searchParams.values().forEach(param -> {
+            if (isEmptyOrNull(param.trim())) {
+                throw new ServiceException(INVALID_SEARCH_PARAMETER_VALUE);
+            }
+        });
+    }
+
+    private void validateCertificateSearchMapKeys(Set<String> keySet) {
+        List<String> searchKeys = Arrays.asList(NAME, DESCRIPTION, ORDER_BY, SORT, TAG_NAME, PAGE, SIZE);
         keySet.forEach(key -> {
             if (!searchKeys.contains(key.trim())) {
                 throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, key);
@@ -56,7 +74,25 @@ public class SearchParamsValidator {
         });
     }
 
-    private static boolean isEmptyOrNull(String str) {
+    private void validateCertificateByTagsSearchMapKeys(Set<String> keySet) {
+        List<String> searchKeys = Arrays.asList(TAG, PAGE, SIZE);
+        keySet.forEach(key -> {
+            if (!searchKeys.contains(key.trim())) {
+                throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, key);
+            }
+        });
+    }
+
+    private void validateTagSearchMapKeys(Set<String> keySet) {
+        List<String> searchKeys = Arrays.asList(NAME, PAGE, SIZE);
+        keySet.forEach(key -> {
+            if (!searchKeys.contains(key.trim())) {
+                throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, key);
+            }
+        });
+    }
+
+    private boolean isEmptyOrNull(String str) {
         return str == null || str.isEmpty();
     }
 }

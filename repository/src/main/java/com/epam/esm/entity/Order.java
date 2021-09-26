@@ -1,12 +1,14 @@
 package com.epam.esm.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Audited
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 @Table(name = "user_order")
-public class Order{
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +25,11 @@ public class Order{
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "certificate_id")
-    private Long certificateId;
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "certificates")
+    private String certificates;
 
     @Column(name = "cost")
     private BigDecimal cost;
@@ -32,9 +37,10 @@ public class Order{
     @Column(name = "purchase_time")
     private LocalDateTime purchaseTime;
 
-    public Order(Long userId, Long certificateId, BigDecimal cost, LocalDateTime purchaseTime) {
+    public Order(Long userId, String userName, String certificates, BigDecimal cost, LocalDateTime purchaseTime) {
         this.userId = userId;
-        this.certificateId = certificateId;
+        this.userName = userName;
+        this.certificates = certificates;
         this.cost = cost;
         this.purchaseTime = purchaseTime;
     }

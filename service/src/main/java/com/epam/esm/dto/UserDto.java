@@ -1,19 +1,24 @@
 package com.epam.esm.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
 @Setter
-public class UserDto extends RepresentationModel<UserDto> {
+@NoArgsConstructor
+@AllArgsConstructor
+@Relation(collectionRelation = "users", itemRelation = "user")
+public class UserDto extends UserWithoutOrdersDto {
 
-    private Long id;
-    private String name;
-    private String surname;
-    private BigDecimal balance;
     private List<OrderDto> orders;
+
+    public UserDto(Long id, String name, String surname, List<OrderDto> orders) {
+        super(id, name, surname);
+        this.orders = orders;
+    }
 }

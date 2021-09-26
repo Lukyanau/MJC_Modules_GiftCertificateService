@@ -6,8 +6,8 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.CertificateMapper;
-import com.epam.esm.repositoty.CertificateRepository;
-import com.epam.esm.repositoty.TagRepository;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.BaseValidator;
 import com.epam.esm.validator.CertificateValidator;
@@ -18,15 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 import static com.epam.esm.utils.CertificateSearchParameters.TAG_NAME;
+import static com.epam.esm.utils.TagSearchParameters.TAG;
 
 /**
  * Certificate class with CRUD methods
@@ -38,18 +37,17 @@ import static com.epam.esm.utils.CertificateSearchParameters.TAG_NAME;
 @RequiredArgsConstructor
 public class CertificateServiceImpl implements CertificateService {
 
-    private final CertificateRepository certificateRepository;
+    private final CertificateRepositoryImpl certificateRepository;
     private final CertificateValidator certificateValidator;
     private final CertificateMapper certificateMapper;
     private final SearchParamsValidator searchValidator;
     private final BaseValidator baseValidator;
-    private final TagRepository tagRepository;
+    private final TagRepositoryImpl tagRepository;
     private final TagValidator tagValidator;
 
 
     /**
-     * Transactional method for adding
-     * certificate in DB
+     * method for adding certificate in DB
      *
      * @param certificateDto is object from request
      * @return added object
@@ -84,9 +82,10 @@ public class CertificateServiceImpl implements CertificateService {
      * @return list of founded objects
      */
     @Override
-    public List<ResponseCertificateDto> getCertificates(Map<String, String> searchParams) {
-        searchValidator.checkSearchParams(searchParams);
-        Optional<List<GiftCertificate>> allCertificates = certificateRepository.getAll(searchParams);
+    public List<ResponseCertificateDto> getCertificates(Map<String, String> searchParams, Integer page, Integer size) {
+        searchValidator.checkCertificateSearchParams(searchParams);
+        baseValidator.checkPaginationParams(page, size);
+        Optional<List<GiftCertificate>> allCertificates = certificateRepository.getAll(searchParams, page, size);
         if (allCertificates.isEmpty()) {
             throw new ServiceException(NOT_FOUND_CERTIFICATES);
         }
@@ -99,18 +98,27 @@ public class CertificateServiceImpl implements CertificateService {
         return currentCertificates.stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
     }
 
+    /**
+     * Method for searching certificates by number of tags
+     *
+     * @param searchParams is tags names
+     * @return list of founded and sorted certificates
+     */
     @Override
-    public List<ResponseCertificateDto> getCertificatesByTags(List<String> tags) {
-        tags.forEach(tagValidator::checkTagDtoName);
-        Optional<List<GiftCertificate>> allCertificates = certificateRepository.getAll(Collections.emptyMap());
-        if (allCertificates.isEmpty()) {
+    public List<ResponseCertificateDto> getCertificatesByTags(Map<String, String> searchParams, Integer page, Integer size) {
+        baseValidator.checkPaginationParams(page, size);
+        searchValidator.checkCertificateByTagsSearchParams(searchParams);
+        if (searchParams.isEmpty() || !searchParams.containsKey(TAG)) {
+            throw new ServiceException(NO_TAGS_SEARCH_PARAMS);
+        }
+        List<String> tagNames = splitTagNames(searchParams.get(TAG));
+        tagNames.forEach(tagValidator::checkTagDtoName);
+        Optional<List<GiftCertificate>> certificatesByTags = certificateRepository.getByTags(tagNames, page, size);
+        if (certificatesByTags.isEmpty()) {
             throw new ServiceException(NOT_FOUND_CERTIFICATES);
         }
-        List<GiftCertificate> currentCertificates = allCertificates.get();
-        AtomicReference<List<GiftCertificate>> filteredCertificates = new AtomicReference<>(currentCertificates);
-        tags.forEach(tag ->
-                filteredCertificates.set(getCertificatesByTag(filteredCertificates.get(), tag.trim().toLowerCase())));
-        return filteredCertificates.get().stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
+        List<GiftCertificate> currentCertificates = certificatesByTags.get();
+        return currentCertificates.stream().map(certificateMapper::convertToDto).collect(Collectors.toList());
     }
 
     /**
@@ -131,7 +139,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     /**
-     * Transactional method for updating certificate
+     * Method for updating certificate
      *
      * @param id             is certificate id
      * @param certificateDto is object from request
@@ -199,10 +207,10 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean deleteCertificateById(long id) {
         baseValidator.checkId(id);
-        if (!(certificateRepository.delete(id) > 0)) {
+        if (!(certificateRepository.delete(id))) {
             throw new ServiceException(NOT_DELETE_CERTIFICATE, String.valueOf(id));
         }
-        return certificateRepository.delete(id) > 0;
+        return true;
     }
 
     @Transactional
@@ -257,5 +265,10 @@ public class CertificateServiceImpl implements CertificateService {
         if (preUpdatedCertificate.getDuration() == 0) {
             preUpdatedCertificate.setDuration(giftCertificate.getDuration());
         }
+    }
+
+    private List<String> splitTagNames(String tagNames) {
+        List<String> currentTagNames = List.of(tagNames.split(","));
+        return currentTagNames.stream().map(String::trim).map(String::toLowerCase).collect(Collectors.toList());
     }
 }

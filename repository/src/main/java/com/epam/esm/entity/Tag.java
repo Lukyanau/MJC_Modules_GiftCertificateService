@@ -1,12 +1,12 @@
 package com.epam.esm.entity;
 
 import lombok.*;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
+@Audited
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

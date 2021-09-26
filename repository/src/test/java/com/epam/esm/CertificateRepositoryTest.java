@@ -2,15 +2,12 @@ package com.epam.esm;
 
 import com.epam.esm.configuration.TestRepositoryConfiguration;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.repositoty.impl.CertificateRepositoryImpl;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,8 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ContextConfiguration(classes = TestRepositoryConfiguration.class)
+@SpringBootTest(classes = TestRepositoryConfiguration.class)
 @ActiveProfiles("dev")
 public class CertificateRepositoryTest {
 
@@ -36,7 +32,7 @@ public class CertificateRepositoryTest {
     void findAllShouldReturnCorrectListSizeOfGiftCertificates() {
         int expectedResult = 3;
 
-        int actualResult = certificateRepository.getAll(Collections.emptyMap()).get().size();
+        int actualResult = certificateRepository.getAll(Collections.emptyMap(), 1, 3).get().size();
 
         assertEquals(expectedResult, actualResult);
     }
@@ -45,7 +41,7 @@ public class CertificateRepositoryTest {
     void findAllShouldReturnIncorrectListSizeOfGiftCertificates() {
         int expectedResult = 0;
 
-        int actualResult = certificateRepository.getAll(Collections.emptyMap()).get().size();
+        int actualResult = certificateRepository.getAll(Collections.emptyMap(), 0, 0).get().size();
 
         assertNotEquals(expectedResult, actualResult);
     }
@@ -128,7 +124,7 @@ public class CertificateRepositoryTest {
                 .of(2021, 1, 1, 17, 0, 0));
         expectedGiftCertificate.setTags(new ArrayList<>());
 
-        assertDoesNotThrow(() -> certificateRepository.updateCertificate(4L,giftCertificate));
+        assertDoesNotThrow(() -> certificateRepository.updateCertificate(4L, giftCertificate));
     }
 
     @Test

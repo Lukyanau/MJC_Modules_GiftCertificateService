@@ -1,6 +1,7 @@
 package com.epam.esm.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Audited
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -15,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @Table(name = "gift_certificate")
-public class GiftCertificate{
+public class GiftCertificate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

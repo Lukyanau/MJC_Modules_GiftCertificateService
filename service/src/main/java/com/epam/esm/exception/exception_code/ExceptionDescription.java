@@ -3,14 +3,20 @@ package com.epam.esm.exception.exception_code;
 /**
  * Class with exception codes
  * for ServiceException
- * @see com.epam.esm.exception.ServiceException
+ *
  * @author Lukyanau I.M.
  * @version 1.0
+ * @see com.epam.esm.exception.ServiceException
  */
 public enum ExceptionDescription {
 
     //Common codes
     INVALID_ID("CM-00001"),
+    INVALID_PAGINATION_PARAM("CM-00002"),
+
+    //Pagination codes
+    INVALID_PAGE_VALUE("PN-00001"),
+    INVALID_SIZE_VALUE("PN-00002"),
 
     //Certificate codes
     CERTIFICATE_WITH_ID_NOT_FOUND("CF-00001"),
@@ -36,6 +42,7 @@ public enum ExceptionDescription {
     NOT_ADD_TAG("TG-00005"),
     TAG_USED_IN_SOME_CERTIFICATES("TG-00006"),
     NOT_DELETE_TAG("TG-00007"),
+    NO_TAGS_SEARCH_PARAMS("TG-00008"),
 
     //Order
     ORDER_WITH_ID_NOT_FOUND("OR-00001"),
@@ -43,7 +50,8 @@ public enum ExceptionDescription {
     //User codes
     NOT_FOUND_USERS("US-00001"),
     USER_WITH_ID_NOT_FOUND("US-00002"),
-    NOT_ENOUGH_MONEY("US-00003");
+    NOT_ENOUGH_MONEY("US-00003"),
+    NO_CERTIFICATE_IDS_FOR_ORDER("US-00004");
 
     private final String errorCode;
 

@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Custom exception class for
  * service and validators
+ *
  * @author Lukyana I.M.
  * @version 1.0
  */
@@ -19,6 +20,7 @@ public class ServiceException extends RuntimeException {
     public ServiceException(ExceptionDescription exceptionDescription) {
         super();
         this.errorCode = exceptionDescription.getErrorCode();
+        System.out.println(errorCode);
     }
 
     public ServiceException(List<ExceptionDescription> errorCodes) {

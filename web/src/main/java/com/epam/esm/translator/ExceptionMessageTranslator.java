@@ -9,6 +9,7 @@ import java.util.Locale;
 
 /**
  * Class for exception message translation
+ *
  * @author Lukyanau I.M.
  * @version 1.0
  */
@@ -20,6 +21,7 @@ public class ExceptionMessageTranslator {
 
     /**
      * Method that translate exception message
+     *
      * @param messageCode is exception code
      * @return translated message
      */

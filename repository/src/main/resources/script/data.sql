@@ -1,9 +1,9 @@
 create table gift_certificate
 (
-    id          int auto_increment primary key,
+    id          bigint auto_increment primary key,
     name        varchar(50) not null,
     description varchar(50) not null,
-    price       decimal     not null,
+    price       decimal(10)     not null,
     duration    int         not null,
     created     datetime    not null,
     updated     datetime    not null

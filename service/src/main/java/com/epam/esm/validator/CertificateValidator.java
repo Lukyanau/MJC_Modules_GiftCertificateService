@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 
@@ -20,69 +21,58 @@ import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
 @Component
 public class CertificateValidator {
 
-    private static final long MIN_CERTIFICATE_ID = 1;
-    private static final long MIN_CERTIFICATE_PRICE = 1;
-    private static final long MAX_CERTIFICATE_PRICE = 1000;
+    private static final BigDecimal MIN_CERTIFICATE_PRICE = BigDecimal.valueOf(1);
+    private static final BigDecimal MAX_CERTIFICATE_PRICE = BigDecimal.valueOf(1000);
     private static final long MIN_CERTIFICATE_DURATION = 30;
     private static final long MAX_CERTIFICATE_DURATION = 180;
-    private static final String PRICE_REGEX = "^\\d+\\.?\\d+$";
-    private static final String ID_REGEX = "^[0-9]+$";
-    private static final String DURATION_REGEX = ID_REGEX;
     private static final String NAME_REGEX = "^(.{3,50})$";
     private static final String DESCRIPTION_REGEX = NAME_REGEX;
 
     public void validateCertificateDto(RequestCertificateDto certificateDto) {
         List<ExceptionDescription> errorCodes = new ArrayList<>();
-        //List<error>
         if (!checkCertificateDtoName(certificateDto.getName())) {
             errorCodes.add(INVALID_CERTIFICATE_NAME);
         }
         if (!checkCertificateDtoDescription(certificateDto.getDescription())) {
             errorCodes.add(INVALID_CERTIFICATE_DESCRIPTION);
         }
-        if (checkCertificateDtoPrice(certificateDto.getPrice()) != null) {
-            errorCodes.add(checkCertificateDtoPrice(certificateDto.getPrice()));
+        if (checkCertificateDtoPrice(certificateDto.getPrice()).isPresent()) {
+            errorCodes.add(checkCertificateDtoPrice(certificateDto.getPrice()).get());
         }
-        if (checkCertificateDtoDuration(certificateDto.getDuration()) != null) {
+        if (checkCertificateDtoDuration(certificateDto.getDuration()).isPresent()) {
             errorCodes.add(INVALID_CERTIFICATE_DURATION);
         }
         if (!errorCodes.isEmpty()) {
             throw new ServiceException(errorCodes);
-        }//map is not empty throw ServiceException
+        }
     }
 
     private boolean checkCertificateDtoName(String name) {
-        return !isEmptyOrNull(name) && name.trim().matches(NAME_REGEX);
+        return !isNull(name) && !name.isEmpty() && name.trim().matches(NAME_REGEX);
     }
 
     private boolean checkCertificateDtoDescription(String description) {
-        return !isEmptyOrNull(description) && description.trim().matches(DESCRIPTION_REGEX);
+        return !isNull(description) && !description.isEmpty() && description.trim().matches(DESCRIPTION_REGEX);
     }
 
-    private ExceptionDescription checkCertificateDtoPrice(BigDecimal price) {
-        String strPrice = String.valueOf(price);
-        if (isEmptyOrNull(strPrice) || !strPrice.matches(PRICE_REGEX)) {
-            return INVALID_CERTIFICATE_PRICE;
+    private Optional<ExceptionDescription> checkCertificateDtoPrice(BigDecimal price) {
+        if (isNull(price)) {
+            return Optional.of(INVALID_CERTIFICATE_PRICE);
         }
-        int certificatePrice = price.intValue();
-        if (!(MIN_CERTIFICATE_PRICE <= certificatePrice && certificatePrice <= MAX_CERTIFICATE_PRICE)) {
-            return WRONG_CERTIFICATE_PRICE_RANGE;
+        if (!(price.compareTo(MIN_CERTIFICATE_PRICE) >= 0 && price.compareTo(MAX_CERTIFICATE_PRICE) <= 0)) {
+            return Optional.of(WRONG_CERTIFICATE_PRICE_RANGE);
         }
-        return null;
+        return Optional.empty();
     }
 
-    private ExceptionDescription checkCertificateDtoDuration(int duration) {
-        String strDuration = String.valueOf(duration);
-        if (isEmptyOrNull(strDuration) || !strDuration.matches(DURATION_REGEX) || duration == 0) {
-            return INVALID_CERTIFICATE_DURATION;
-        }
+    private Optional<ExceptionDescription> checkCertificateDtoDuration(int duration) {
         if (!(MIN_CERTIFICATE_DURATION <= duration && duration <= MAX_CERTIFICATE_DURATION)) {
-            return WRONG_CERTIFICATE_DURATION_RANGE;
+            return Optional.of(WRONG_CERTIFICATE_DURATION_RANGE);
         }
-        return null;
+        return Optional.empty();
     }
 
-    private boolean isEmptyOrNull(String str) {
-        return str == null || str.isEmpty();
+    private boolean isNull(Object obj) {
+        return obj == null;
     }
 }

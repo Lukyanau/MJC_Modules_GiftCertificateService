@@ -55,7 +55,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String localizedErrorMessage;
         if (ex.getErrorReason() != null) {
             localizedErrorMessage = String.format(translator.translateToLocale(ex.getErrorCode()), ex.getErrorReason());
-        } else if (ex.getErrorCodes().isEmpty()) {
+        } else if (ex.getErrorCodes() == null) {
             localizedErrorMessage = translator.translateToLocale(ex.getErrorCode());
         } else {
             StringBuilder stringBuilder = new StringBuilder();

@@ -8,12 +8,14 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Relation(collectionRelation = "tags", itemRelation = "tag")
-public class TagDto extends RepresentationModel<TagDto> {
+@Relation(collectionRelation = "users", itemRelation = "user")
+public class UserWithoutOrdersDto extends RepresentationModel<UserWithoutOrdersDto> {
 
-    private long id;
+    private Long id;
     private String name;
+    private String surname;
+
 }

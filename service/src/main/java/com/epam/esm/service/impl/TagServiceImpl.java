@@ -4,21 +4,20 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.TagMapper;
-import com.epam.esm.repositoty.TagRepository;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.BaseValidator;
+import com.epam.esm.validator.SearchParamsValidator;
 import com.epam.esm.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.epam.esm.exception.exception_code.ExceptionDescription.*;
-import static com.epam.esm.utils.TagSearchParameters.NAME;
 
 /**
  * Tag class with CRD methods
@@ -30,10 +29,11 @@ import static com.epam.esm.utils.TagSearchParameters.NAME;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
-    private final TagRepository tagRepository;
+    private final TagRepositoryImpl tagRepository;
     private final TagMapper tagMapper;
     private final TagValidator tagValidator;
     private final BaseValidator baseValidator;
+    private final SearchParamsValidator searchParamsValidator;
 
     /**
      * Method for searching all tags
@@ -42,25 +42,14 @@ public class TagServiceImpl implements TagService {
      * @return list of founded objects
      */
     @Override
-    public List<TagDto> getTags(Map<String, String> searchParam) {
-        Optional<List<Tag>> allTags = tagRepository.getAll(Collections.emptyMap());
+    public List<TagDto> getTags(Map<String, String> searchParam, Integer page, Integer size) {
+        baseValidator.checkPaginationParams(page, size);
+        searchParamsValidator.checkTagSearchParams(searchParam);
+        Optional<List<Tag>> allTags = tagRepository.getAll(searchParam, page, size);
         if (allTags.isEmpty()) {
             throw new ServiceException(NOT_FOUND_TAGS);
         }
         List<Tag> currentTags = allTags.get();
-        if (!searchParam.isEmpty()) {
-            if (searchParam.get(NAME) != null) {
-                tagValidator.checkTagDtoName(searchParam.get(NAME).trim());
-                List<Tag> filteredTags = currentTags.stream().filter(tag -> tag.getName().
-                                equals(searchParam.get(NAME).trim().toLowerCase()))
-                        .collect(Collectors.toList());
-                if (filteredTags.isEmpty()) {
-                    throw new ServiceException(NO_TAGS_WITH_THIS_NAME, searchParam.get(NAME).trim());
-                }
-                return filteredTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
-            }
-            throw new ServiceException(NO_SUCH_SEARCH_PARAMETER, searchParam.keySet().toString());
-        }
         return currentTags.stream().map(tagMapper::convertToDto).collect(Collectors.toList());
     }
 
@@ -110,7 +99,7 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.checkUsedTags(id) > 0) {
             throw new ServiceException(TAG_USED_IN_SOME_CERTIFICATES, String.valueOf(id));
         }
-        if (!(tagRepository.delete(id) > 0)) {
+        if (!(tagRepository.delete(id))) {
             throw new ServiceException(NOT_DELETE_TAG, String.valueOf(id));
         }
         return true;

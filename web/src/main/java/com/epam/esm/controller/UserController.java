@@ -3,129 +3,112 @@ package com.epam.esm.controller;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserWithoutOrdersDto;
 import com.epam.esm.service.UserService;
+import com.epam.esm.util.UserLinkCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+/**
+ * User controller with GET and POST methods
+ *
+ * @author Lukyanau I.M.
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserLinkCreator<UserDto> userLinkCreator;
+    private final UserLinkCreator<UserWithoutOrdersDto> userWithoutOrdersLinkCreator;
 
-    private static final long USER_ID_EXAMPLE = 1;
-    private static final long ORDER_ID_EXAMPLE = USER_ID_EXAMPLE;
-
+    /**
+     * method founds all users with pagination
+     *
+     * @param page is number of page
+     * @param size is count of users on page
+     * @return collection of users with links
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<UserDto> getUsers() {
-        List<UserDto> currentUsers = userService.getUsers();
-        currentUsers.forEach(user -> {
-            Link getByIdLink = linkTo(methodOn(UserController.class).getUserById(user.getId())).withSelfRel();
-            Link getOrdersLink = linkTo(methodOn(UserController.class).getUserOrders(user.getId())).withRel("getUserOrders");
-            Link getOrderByIdLink = linkTo(methodOn(UserController.class).getUserOrderById(user.getId(), ORDER_ID_EXAMPLE)).
-                    withRel("getUserOrderById");
-            Link getMostUsedTagLink = linkTo(methodOn(UserController.class).getUserMostUsedTag()).withRel("getMostUsedTag");
-            Link makeOrderLink = linkTo(methodOn(UserController.class).makeOrder(user.getId(), ORDER_ID_EXAMPLE)).
-                    withRel("makeOrder");
-            user.add(getByIdLink, getOrdersLink, getOrderByIdLink, getMostUsedTagLink, makeOrderLink);
-        });
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return CollectionModel.of(currentUsers, selfLink);
+    public CollectionModel<UserWithoutOrdersDto> getUsers(@RequestParam(name = "page", required = false, defaultValue = "1")
+                                                                      Integer page,
+                                                          @RequestParam(name = "size", required = false, defaultValue = "10")
+                                                                  Integer size) {
+        return userWithoutOrdersLinkCreator.addLinkToUsers(userService.getUsers(page, size));
     }
 
+    /**
+     * method founds user by id
+     *
+     * @param id is user id
+     * @return founded user with links
+     */
     @GetMapping(value = "{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<UserDto> getUserById(@PathVariable("id") long id) {
-        UserDto currentUser = userService.getUserById(id);
-        Link getUsersLink = linkTo(methodOn(UserController.class).getUsers()).withRel("getUsers");
-        Link getOrdersLink = linkTo(methodOn(UserController.class).getUserOrders(id)).
-                withRel("getUserOrders");
-        Link getOrderByIdLink = linkTo(methodOn(UserController.class).getUserOrderById(id, ORDER_ID_EXAMPLE)).
-                withRel("getUserOrderById");
-        Link getMostUsedTagLink = linkTo(methodOn(UserController.class).getUserMostUsedTag()).withRel("getMostUsedTag");
-        Link makeOrderLink = linkTo(methodOn(UserController.class).makeOrder(id, ORDER_ID_EXAMPLE)).
-                withRel("makeOrder");
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return EntityModel.of(currentUser, getUsersLink, getOrdersLink, getOrderByIdLink, getMostUsedTagLink,
-                makeOrderLink, selfLink);
+    public EntityModel<UserWithoutOrdersDto> getUserById(@PathVariable("id") long id) {
+        return userWithoutOrdersLinkCreator.addLinkToUserAndReturn(userService.getUserById(id));
     }
 
+    /**
+     * method founds all user orders with pagination
+     *
+     * @param id   is user id
+     * @param page is page number
+     * @param size is count of orders on page
+     * @return collection of orders
+     */
     @GetMapping(value = "/{id}/orders")
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<OrderDto> getUserOrders(@PathVariable("id") long id) {
-        List<OrderDto> currentOrders = userService.getUserOrders(id);
-        currentOrders.forEach(order -> {
-            Link getAllUsers = linkTo(methodOn(UserController.class).getUsers()).withRel("getAllUsers");
-            Link getByIdLink = linkTo(methodOn(UserController.class).getUserById(id)).withRel("getUserById");
-            Link getOrderByIdLink = linkTo(methodOn(UserController.class).getUserOrderById(id, ORDER_ID_EXAMPLE)).
-                    withRel("getUserOrderById");
-            Link getMostUsedTagLink = linkTo(methodOn(UserController.class).getUserMostUsedTag()).withRel("getMostUsedTag");
-            Link makeOrderLink = linkTo(methodOn(UserController.class).makeOrder(id, ORDER_ID_EXAMPLE)).
-                    withRel("makeOrder");
-            order.add(getAllUsers, getByIdLink, getOrderByIdLink, getMostUsedTagLink, makeOrderLink);
-        });
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return CollectionModel.of(currentOrders, selfLink);
+    public CollectionModel<OrderDto> getUserOrders(@PathVariable("id") long id,
+                                                   @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+                                                   @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+        return userLinkCreator.addLinkToOrders(userService.getUserOrders(id, page, size));
     }
 
+    /**
+     * method founds user order
+     *
+     * @param userId  is user id
+     * @param orderId is order id
+     * @return user order
+     */
     @GetMapping(value = "/{userId}/order/{orderId}")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<OrderDto> getUserOrderById(@PathVariable("userId") long userId, @PathVariable("orderId") long orderId) {
-        OrderDto currentOrder = userService.getUserOrderById(userId, orderId);
-        Link getUsersLink = linkTo(methodOn(UserController.class).getUsers()).withRel("getUsers");
-        Link getByIdLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("getUserById");
-        Link getOrdersLink = linkTo(methodOn(UserController.class).getUserOrders(userId)).
-                withRel("getUserOrders");
-        Link getMostUsedTagLink = linkTo(methodOn(UserController.class).getUserMostUsedTag()).withRel("getMostUsedTag");
-        Link makeOrderLink = linkTo(methodOn(UserController.class).makeOrder(userId, ORDER_ID_EXAMPLE)).
-                withRel("makeOrder");
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return EntityModel.of(currentOrder, getUsersLink, getByIdLink, getOrdersLink, getMostUsedTagLink,
-                makeOrderLink, selfLink);
+        return userLinkCreator.addLinkToOrderAndReturn(userService.getUserOrderById(userId, orderId));
     }
 
+    /**
+     * method founds most used tag of user with the highest cost of all orders
+     *
+     * @return most used tag
+     */
     @GetMapping(value = "/most_used_tag")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<TagDto> getUserMostUsedTag() {
-        TagDto currentTag = userService.getUserMostUsedTag();
-        Link getUsersLink = linkTo(methodOn(UserController.class).getUsers()).withRel("getUsers");
-        Link getByIdLink = linkTo(methodOn(UserController.class).getUserById(USER_ID_EXAMPLE)).withRel("getUserById");
-        Link getOrdersLink = linkTo(methodOn(UserController.class).getUserOrders(USER_ID_EXAMPLE)).
-                withRel("getUserOrders");
-        Link getOrderByIdLink = linkTo(methodOn(UserController.class).getUserOrderById(USER_ID_EXAMPLE, ORDER_ID_EXAMPLE)).
-                withRel("getUserOrderById");
-        Link makeOrderLink = linkTo(methodOn(UserController.class).makeOrder(USER_ID_EXAMPLE, ORDER_ID_EXAMPLE)).
-                withRel("makeOrder");
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return EntityModel.of(currentTag, getUsersLink, getByIdLink, getOrdersLink, getOrderByIdLink, makeOrderLink,
-                selfLink);
+        return userLinkCreator.addLinkToTag(userService.getUserMostUsedTag());
+
     }
 
-    @PostMapping(value = "{userId}/order/{certificateId}")
+    /**
+     * method make user order
+     *
+     * @param userId         is user id
+     * @param certificateIds is certificates ids
+     * @return user with orders
+     */
+    @PostMapping(value = "{userId}/make_order")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<UserDto> makeOrder(@PathVariable("userId") long userId,
-                                          @PathVariable("certificateId") long certificateId) {
-        UserDto currentUser = userService.makeOrder(userId, certificateId);
-        Link getUsersLink = linkTo(methodOn(UserController.class).getUsers()).withRel("getUsers");
-        Link getByIdLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("getUserById");
-        Link getOrdersLink = linkTo(methodOn(UserController.class).getUserOrders(userId)).
-                withRel("getUserOrders");
-        Link getOrderByIdLink = linkTo(methodOn(UserController.class).getUserOrderById(userId, ORDER_ID_EXAMPLE)).
-                withRel("getUserOrderById");
-        Link getMostUsedTagLink = linkTo(methodOn(UserController.class).getUserMostUsedTag()).withRel("getMostUsedTag");
-        Link selfLink = linkTo(UserController.class).withSelfRel();
-        return EntityModel.of(currentUser, getUsersLink, getByIdLink, getOrdersLink, getOrderByIdLink, getMostUsedTagLink,
-                selfLink);
+                                          @RequestParam List<Long> certificateIds) {
+        return userLinkCreator.addLinkToUserAndReturn(userService.makeOrder(userId, certificateIds));
     }
 }

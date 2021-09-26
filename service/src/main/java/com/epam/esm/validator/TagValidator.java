@@ -14,18 +14,16 @@ import static com.epam.esm.exception.exception_code.ExceptionDescription.INVALID
 @Component
 public class TagValidator {
 
-    private static final long MIN_TAG_ID = 1;
-    private static final String ID_REGEX = "^[0-9]+$";
     private static final String NAME_REGEX = "^(.{3,50})$";
 
     public void checkTagDtoName(String name) {
-        if (isEmptyOrNull(name) || !name.trim().matches(NAME_REGEX)) {
+        if (!isNull(name) && !name.isEmpty() && !name.trim().matches(NAME_REGEX)) {
             throw new ServiceException(INVALID_TAG_NAME, name.trim());
         }
     }
 
-    private static boolean isEmptyOrNull(String str) {
-        return str == null || str.isEmpty();
+    private boolean isNull(String str) {
+        return str == null;
     }
 
 }

@@ -4,17 +4,20 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.TagMapper;
-import com.epam.esm.repositoty.TagRepository;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.BaseValidator;
+import com.epam.esm.validator.SearchParamsValidator;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,19 +25,21 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = TagServiceTest.class)
 public class TagServiceTest {
 
-    private TagRepository tagRepository;
+    private TagRepositoryImpl tagRepository;
     private TagMapper tagMapper;
     private TagValidator tagValidator;
     private BaseValidator baseValidator;
+    private SearchParamsValidator searchParamsValidator;
     private TagService tagService;
 
     @BeforeEach
     void setUp() {
-        tagRepository = mock(TagRepository.class);
+        tagRepository = mock(TagRepositoryImpl.class);
         tagMapper = mock(TagMapper.class);
         tagValidator = new TagValidator();
         baseValidator = new BaseValidator();
-        tagService = new TagServiceImpl(tagRepository, tagMapper, tagValidator, baseValidator);
+        searchParamsValidator = new SearchParamsValidator();
+        tagService = new TagServiceImpl(tagRepository, tagMapper, tagValidator, baseValidator, searchParamsValidator);
 
     }
 
@@ -44,6 +49,7 @@ public class TagServiceTest {
         tagMapper = null;
         tagValidator = null;
         baseValidator = null;
+        searchParamsValidator = null;
         tagService = null;
     }
 
@@ -53,19 +59,18 @@ public class TagServiceTest {
         tag1.setId(1L);
         tag1.setName("gilly");
         Tag tag2 = new Tag();
-        tag1.setId(2L);
-        tag1.setName("ford");
-        when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.of(List.of(tag1, tag2)));
-        when(tagMapper.convertToDto(any(Tag.class))).thenReturn(any(TagDto.class));
+        tag2.setId(2L);
+        tag2.setName("ford");
+        when(tagRepository.getAll(Collections.emptyMap(), 1, 1)).thenReturn(Optional.of(List.of(tag1, tag2)));
         int expectedSize = 2;
-        int actualSize = tagService.getTags(Collections.emptyMap()).size();
+        int actualSize = tagService.getTags(Collections.emptyMap(), 1, 1).size();
         assertEquals(expectedSize, actualSize);
     }
 
     @Test
     void getTagsNoTagsShouldThrowException() {
-        when(tagRepository.getAll(Collections.emptyMap())).thenReturn(Optional.empty());
-        assertThrows(ServiceException.class, () -> tagService.getTags(anyMap()));
+        when(tagRepository.getAll(Collections.emptyMap(), 1, 1)).thenReturn(Optional.empty());
+        assertThrows(ServiceException.class, () -> tagService.getTags(Collections.emptyMap(), 1, 1));
     }
 
     @Test
@@ -116,7 +121,7 @@ public class TagServiceTest {
     void deleteTagByIdExistTagShouldReturnTrue() {
         long correctId = 10;
         when(tagRepository.checkUsedTags(anyLong())).thenReturn(0L);
-        when(tagRepository.delete(anyLong())).thenReturn(1);
+        when(tagRepository.delete(anyLong())).thenReturn(true);
         assertTrue(tagService.deleteTagById(correctId));
     }
 
@@ -124,7 +129,7 @@ public class TagServiceTest {
     void deleteTagByIdNonExistTagShouldThrowException() {
         long correctIdNotExist = 10;
         when(tagRepository.checkUsedTags(anyLong())).thenReturn(0L);
-        when(tagRepository.delete(anyLong())).thenReturn(0);
+        when(tagRepository.delete(anyLong())).thenReturn(false);
         assertThrows(ServiceException.class, () -> tagService.deleteTagById(correctIdNotExist));
     }
 

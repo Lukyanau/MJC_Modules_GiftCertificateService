@@ -1,12 +1,13 @@
 package com.epam.esm.entity;
 
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
+@Audited
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -25,9 +26,6 @@ public class User {
 
     @Column(name = "surname")
     private String surname;
-
-    @Column(name = "balance")
-    private BigDecimal balance;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
