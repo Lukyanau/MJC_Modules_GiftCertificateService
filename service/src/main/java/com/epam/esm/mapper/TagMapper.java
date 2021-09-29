@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TagMapper {
 
-    private final ModelMapper modelMapper;
+  private final ModelMapper modelMapper;
 
-    public Tag convertToEntity(TagDto tagDto) {
-        return modelMapper.map(tagDto, Tag.class);
-    }
+  public Tag convertToEntity(TagDto tagDto) {
+    return modelMapper.map(tagDto, Tag.class);
+  }
 
-    public TagDto convertToDto(Tag tag) {
-        return modelMapper.map(tag, TagDto.class);
-    }
+  public TagDto convertToDto(Tag tag) {
+    return modelMapper.map(tag, TagDto.class);
+  }
 }

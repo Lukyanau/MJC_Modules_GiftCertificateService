@@ -15,10 +15,10 @@ import java.util.List;
 @Relation(collectionRelation = "users", itemRelation = "user")
 public class UserDto extends UserWithoutOrdersDto {
 
-    private List<OrderDto> orders;
+  private List<OrderDto> orders;
 
-    public UserDto(Long id, String name, String surname, List<OrderDto> orders) {
-        super(id, name, surname);
-        this.orders = orders;
-    }
+  public UserDto(Long id, String name, String surname, List<OrderDto> orders) {
+    super(id, name, surname);
+    this.orders = orders;
+  }
 }

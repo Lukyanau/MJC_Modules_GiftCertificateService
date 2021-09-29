@@ -14,8 +14,7 @@ import org.springframework.hateoas.server.core.Relation;
 @Relation(collectionRelation = "users", itemRelation = "user")
 public class UserWithoutOrdersDto extends RepresentationModel<UserWithoutOrdersDto> {
 
-    private Long id;
-    private String name;
-    private String surname;
-
+  private Long id;
+  private String name;
+  private String surname;
 }

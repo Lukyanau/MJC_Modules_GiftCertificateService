@@ -7,8 +7,11 @@ import java.util.Map;
 
 public interface TagService {
 
-    List<TagDto> getTags(Map<String, String> name, Integer page, Integer size);
-    TagDto getTagById(long id);
-    TagDto addTag(TagDto tagDTO);
-    boolean deleteTagById(long id);
+  List<TagDto> getTags(Map<String, String> name, Integer page, Integer size);
+
+  TagDto getTagById(long id);
+
+  TagDto addTag(TagDto tagDTO);
+
+  boolean deleteTagById(long id);
 }

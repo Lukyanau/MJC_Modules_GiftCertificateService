@@ -14,6 +14,6 @@ import org.springframework.hateoas.server.core.Relation;
 @Relation(collectionRelation = "tags", itemRelation = "tag")
 public class TagDto extends RepresentationModel<TagDto> {
 
-    private long id;
-    private String name;
+  private long id;
+  private String name;
 }

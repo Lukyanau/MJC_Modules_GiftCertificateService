@@ -18,10 +18,9 @@ import java.util.List;
 @Relation(collectionRelation = "orders", itemRelation = "order")
 public class OrderDto extends RepresentationModel<OrderDto> {
 
-    private Long id;
-    private String userName;
-    private List<ResponseCertificateDto> certificates;
-    private BigDecimal totalCost;
-    private LocalDateTime purchaseTime;
-
+  private Long id;
+  private String userName;
+  private List<ResponseCertificateDto> certificates;
+  private BigDecimal totalCost;
+  private LocalDateTime purchaseTime;
 }

@@ -1,9 +1,8 @@
 package com.epam.esm.repository;
 
-import org.springframework.stereotype.Repository;
+import com.epam.esm.entity.User;
 
-@Repository
-public interface UserRepository {
+public interface UserRepository extends BaseRepository<User> {
 
-    Long findMostUsedTagId();
+  Long findMostUsedTagId();
 }

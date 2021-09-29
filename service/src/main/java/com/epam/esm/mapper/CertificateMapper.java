@@ -13,24 +13,29 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CertificateMapper {
 
-    private final ModelMapper modelMapper;
-    private final TagMapper tagMapper;
+  private final ModelMapper modelMapper;
+  private final TagMapper tagMapper;
 
-    public GiftCertificate convertToEntity(RequestCertificateDto requestCertificateDTO) {
-        GiftCertificate giftCertificate = modelMapper.map(requestCertificateDTO, GiftCertificate.class);
-        if (requestCertificateDTO.getTags() != null) {
-            giftCertificate.setTags(requestCertificateDTO.getTags()
-                    .stream().map(tagMapper::convertToEntity).collect(Collectors.toList()));
-        }
-        return giftCertificate;
+  public GiftCertificate convertToEntity(RequestCertificateDto requestCertificateDTO) {
+    GiftCertificate giftCertificate = modelMapper.map(requestCertificateDTO, GiftCertificate.class);
+    if (requestCertificateDTO.getTags() != null) {
+      giftCertificate.setTags(
+          requestCertificateDTO.getTags().stream()
+              .map(tagMapper::convertToEntity)
+              .collect(Collectors.toList()));
     }
+    return giftCertificate;
+  }
 
-    public ResponseCertificateDto convertToDto(GiftCertificate giftCertificate) {
-        ResponseCertificateDto responseCertificateDto = modelMapper.map(giftCertificate, ResponseCertificateDto.class);
-        if (giftCertificate.getTags() != null) {
-            responseCertificateDto.setTags(giftCertificate.getTags()
-                    .stream().map(tagMapper::convertToDto).collect(Collectors.toList()));
-        }
-        return responseCertificateDto;
+  public ResponseCertificateDto convertToDto(GiftCertificate giftCertificate) {
+    ResponseCertificateDto responseCertificateDto =
+        modelMapper.map(giftCertificate, ResponseCertificateDto.class);
+    if (giftCertificate.getTags() != null) {
+      responseCertificateDto.setTags(
+          giftCertificate.getTags().stream()
+              .map(tagMapper::convertToDto)
+              .collect(Collectors.toList()));
     }
+    return responseCertificateDto;
+  }
 }

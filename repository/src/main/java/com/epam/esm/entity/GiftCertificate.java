@@ -19,33 +19,32 @@ import java.util.List;
 @Table(name = "gift_certificate")
 public class GiftCertificate {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 
-    @Column(name = "price")
-    private BigDecimal price;
+  @Column(name = "price")
+  private BigDecimal price;
 
-    @Column(name = "duration")
-    private int duration;
+  @Column(name = "duration")
+  private int duration;
 
-    @Column(name = "created")
-    private LocalDateTime created;
+  @Column(name = "created")
+  private LocalDateTime created;
 
-    @Column(name = "updated")
-    private LocalDateTime updated;
+  @Column(name = "updated")
+  private LocalDateTime updated;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "gift_tag",
-            joinColumns = @JoinColumn(name = "gift_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
-    )
-    private List<Tag> tags;
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "gift_tag",
+      joinColumns = @JoinColumn(name = "gift_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+  private List<Tag> tags;
 }

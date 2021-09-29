@@ -3,11 +3,5 @@ plugins {
 }
 
 dependencies {
-    testImplementation 'com.h2database:h2:1.4.200'
     implementation 'mysql:mysql-connector-java:8.0.25'
-
-}
-
-test {
-    useJUnitPlatform()
 }

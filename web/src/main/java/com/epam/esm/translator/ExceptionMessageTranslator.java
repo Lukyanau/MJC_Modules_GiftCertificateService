@@ -17,16 +17,16 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ExceptionMessageTranslator {
 
-    private final ResourceBundleMessageSource resourceBundleMessageSource;
+  private final ResourceBundleMessageSource resourceBundleMessageSource;
 
-    /**
-     * Method that translate exception message
-     *
-     * @param messageCode is exception code
-     * @return translated message
-     */
-    public String translateToLocale(String messageCode) {
-        Locale currentLocale = LocaleContextHolder.getLocale();
-        return resourceBundleMessageSource.getMessage(messageCode, null, currentLocale);
-    }
+  /**
+   * Method that translate exception message
+   *
+   * @param messageCode is exception code
+   * @return translated message
+   */
+  public String translateToLocale(String messageCode) {
+    Locale currentLocale = LocaleContextHolder.getLocale();
+    return resourceBundleMessageSource.getMessage(messageCode, null, currentLocale);
+  }
 }

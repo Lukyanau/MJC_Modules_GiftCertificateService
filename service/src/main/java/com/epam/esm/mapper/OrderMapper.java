@@ -15,19 +15,18 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class OrderMapper {
 
-    private final Gson gson;
+  private final Gson gson;
 
-    public OrderDto convertToDto(Order order) {
-        OrderDto orderDto = new OrderDto();
-        orderDto.setId(order.getId());
-        orderDto.setUserName(order.getUserName());
-        Type listType = new TypeToken<ArrayList<ResponseCertificateDto>>() {
-        }.getType();
-        ArrayList<ResponseCertificateDto> certificates = gson.fromJson(order.getCertificates(), listType);
-        orderDto.setCertificates(certificates);
-        orderDto.setTotalCost(order.getCost());
-        orderDto.setPurchaseTime(order.getPurchaseTime());
-        return orderDto;
-    }
-
+  public OrderDto convertToDto(Order order) {
+    OrderDto orderDto = new OrderDto();
+    orderDto.setId(order.getId());
+    orderDto.setUserName(order.getUserName());
+    Type listType = new TypeToken<ArrayList<ResponseCertificateDto>>() {}.getType();
+    ArrayList<ResponseCertificateDto> certificates =
+        gson.fromJson(order.getCertificates(), listType);
+    orderDto.setCertificates(certificates);
+    orderDto.setTotalCost(order.getCost());
+    orderDto.setPurchaseTime(order.getPurchaseTime());
+    return orderDto;
+  }
 }

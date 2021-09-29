@@ -13,9 +13,13 @@ import java.util.List;
 @Component
 public class OrderCreator {
 
-    public Order createOrder(User user, List<GiftCertificate> certificates, String certificatesInJson) {
-        BigDecimal totalCost = certificates.stream().map(GiftCertificate::getPrice).reduce(BigDecimal.ZERO,
-                BigDecimal::add);
-        return new Order(user.getId(), user.getName(), certificatesInJson, totalCost, LocalDateTime.now());
-    }
+  public Order createOrder(
+      User user, List<GiftCertificate> certificates, String certificatesInJson) {
+    BigDecimal totalCost =
+        certificates.stream()
+            .map(GiftCertificate::getPrice)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return new Order(
+        user.getId(), user.getName(), certificatesInJson, totalCost, LocalDateTime.now());
+  }
 }

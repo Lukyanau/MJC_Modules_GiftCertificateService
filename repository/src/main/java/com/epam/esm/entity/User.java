@@ -17,17 +17,17 @@ import java.util.List;
 @Table(name = "user")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "surname")
-    private String surname;
+  @Column(name = "surname")
+  private String surname;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private List<Order> orders;
+  @OneToMany(fetch = FetchType.EAGER)
+  @JoinColumn(name = "user_id")
+  private List<Order> orders;
 }

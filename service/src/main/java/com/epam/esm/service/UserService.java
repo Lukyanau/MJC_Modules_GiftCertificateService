@@ -9,10 +9,15 @@ import java.util.List;
 
 public interface UserService {
 
-    List<UserWithoutOrdersDto> getUsers(Integer page, Integer size);
-    UserWithoutOrdersDto getUserById(long id);
-    List<OrderDto> getUserOrders(long userId, Integer page, Integer size);
-    OrderDto getUserOrderById(long userId, long orderId);
-    TagDto getUserMostUsedTag();
-    UserDto makeOrder(long userId, List<Long> certificatesIds);
+  List<UserWithoutOrdersDto> getUsers(Integer page, Integer size);
+
+  UserWithoutOrdersDto getUserById(long id);
+
+  List<OrderDto> getUserOrders(long userId, Integer page, Integer size);
+
+  OrderDto getUserOrderById(long userId, long orderId);
+
+  TagDto getUserMostUsedTag();
+
+  UserDto makeOrder(long userId, List<Long> certificatesIds);
 }

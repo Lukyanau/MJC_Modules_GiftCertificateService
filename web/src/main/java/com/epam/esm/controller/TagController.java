@@ -22,55 +22,56 @@ import java.util.Map;
 @RequestMapping("api/v1/tags")
 public class TagController {
 
-    private final TagService tagService;
-    private final TagLinkCreator tagLinkCreator;
+  private final TagService tagService;
+  private final TagLinkCreator tagLinkCreator;
 
-    /**
-     * method founds all tags with or without name sorting
-     *
-     * @param searchParams is getting from url
-     * @return List of TagDto objects
-     */
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<TagDto> getTags(@RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-                                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-                                           @RequestParam(required = false) Map<String, String> searchParams) {
-        return tagLinkCreator.getTagsWithLinks(tagService.getTags(searchParams, page, size));
-    }
+  /**
+   * method founds all tags with or without name sorting
+   *
+   * @param searchParams is getting from url
+   * @return List of TagDto objects
+   */
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  public CollectionModel<TagDto> getTags(
+      @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+      @RequestParam(required = false) Map<String, String> searchParams) {
+    return tagLinkCreator.getTagsWithLinks(tagService.getTags(searchParams, page, size));
+  }
 
-    /**
-     * method founds tag by its id
-     *
-     * @param id is getting from url
-     * @return a tagDto object if it exists
-     */
-    @GetMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public EntityModel<TagDto> getTagById(@PathVariable("id") long id) {
-        return tagLinkCreator.getTagWithLinks(tagService.getTagById(id));
-    }
+  /**
+   * method founds tag by its id
+   *
+   * @param id is getting from url
+   * @return a tagDto object if it exists
+   */
+  @GetMapping(value = "/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public EntityModel<TagDto> getTagById(@PathVariable("id") long id) {
+    return tagLinkCreator.getTagWithLinks(tagService.getTagById(id));
+  }
 
-    /**
-     * method adds tag
-     *
-     * @param tagDto is getting from request body
-     * @return List of TagDto objects
-     */
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<TagDto> addTag(@RequestBody TagDto tagDto) {
-        return tagLinkCreator.getTagWithLinks(tagService.addTag(tagDto));
-    }
+  /**
+   * method adds tag
+   *
+   * @param tagDto is getting from request body
+   * @return List of TagDto objects
+   */
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public EntityModel<TagDto> addTag(@RequestBody TagDto tagDto) {
+    return tagLinkCreator.getTagWithLinks(tagService.addTag(tagDto));
+  }
 
-    /**
-     * method deletes tag
-     *
-     * @param id is getting from url
-     */
-    @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTagById(@PathVariable("id") long id) {
-        tagService.deleteTagById(id);
-    }
+  /**
+   * method deletes tag
+   *
+   * @param id is getting from url
+   */
+  @DeleteMapping(value = "/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteTagById(@PathVariable("id") long id) {
+    tagService.deleteTagById(id);
+  }
 }
