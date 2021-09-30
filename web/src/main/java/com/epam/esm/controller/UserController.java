@@ -80,7 +80,7 @@ public class UserController {
    * @param orderId is order id
    * @return user order
    */
-  @GetMapping(value = "/{userId}/order/{orderId}")
+  @GetMapping(value = "/{userId}/orders/{orderId}")
   @ResponseStatus(HttpStatus.OK)
   public EntityModel<OrderDto> getUserOrderById(
       @PathVariable("userId") long userId, @PathVariable("orderId") long orderId) {
@@ -105,10 +105,10 @@ public class UserController {
    * @param certificateIds is certificates ids
    * @return user with orders
    */
-  @PostMapping(value = "{userId}/make_order")
+  @PostMapping(value = "{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   public EntityModel<UserDto> makeOrder(
-      @PathVariable("userId") long userId, @RequestParam List<Long> certificateIds) {
+      @PathVariable("userId") long userId, @RequestBody List<Long> certificateIds) {
     return userLinkCreator.addLinkToUserAndReturn(userService.makeOrder(userId, certificateIds));
   }
 }

@@ -39,6 +39,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   private final ExceptionMessageTranslator translator;
 
   private static final Logger LOGGER = LogManager.getLogger();
+  private static final String NOT_FOUND_EN = "not found";
+  private static final String NOT_FOUND_RU = "\u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d";
 
   /**
    * Method for handling custom exceptions
@@ -49,8 +51,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
    * @see ApiError
    */
   @ExceptionHandler(ServiceException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ApiError customHandle(ServiceException ex) {
+  public ResponseEntity<ApiError> customHandle(ServiceException ex) {
     String localizedErrorMessage;
     if (ex.getErrorReason() != null) {
       localizedErrorMessage =
@@ -68,10 +69,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
               });
       System.out.println(stringBuilder);
       localizedErrorMessage = String.valueOf(stringBuilder);
-      return new ApiError(localizedErrorMessage, String.valueOf(errorCodes));
+      ApiError apiError = new ApiError(localizedErrorMessage, String.valueOf(errorCodes));
+      return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
     LOGGER.error(localizedErrorMessage);
-    return new ApiError(localizedErrorMessage, ex.getErrorCode());
+    ApiError apiError = new ApiError(localizedErrorMessage, ex.getErrorCode());
+    if (apiError.getErrorMessage().contains(NOT_FOUND_EN)
+        || apiError.getErrorMessage().contains(NOT_FOUND_RU)) {
+      return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
   /**
