@@ -1,62 +1,35 @@
 package com.epam.esm.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-public class RequestCertificateDto {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Relation(collectionRelation = "certificates", itemRelation = "certificate")
+public class RequestCertificateDto extends RepresentationModel<RequestCertificateDto> {
 
-    private long id;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    private int duration;
-    private List<TagDto> tags;
+  private long id;
+  private String name;
+  private String description;
+  private BigDecimal price;
+  private int duration;
+  private List<TagDto> tags;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public List<TagDto> getCertificateTags() {
-        return tags;
-    }
-
-    public void setCertificateTags(List<TagDto> certificateTags) {
-        this.tags = certificateTags;
-    }
+  public RequestCertificateDto(
+      String name, String description, BigDecimal price, int duration, List<TagDto> tags) {
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.duration = duration;
+    this.tags = tags;
+  }
 }

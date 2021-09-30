@@ -1,20 +1,25 @@
 package com.epam.esm.entity;
 
-public class Tag extends Entity{
+import lombok.*;
+import org.hibernate.envers.Audited;
 
-    public Tag() {
-    }
+import javax.persistence.*;
 
-    public Tag(String name) {
-        super(name);
-    }
+@Entity
+@Audited
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@Table(name = "tag")
+public class Tag {
 
-    public Tag(long id, String name) {
-        super(id, name);
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Override
-    public String toString() {
-        return "Tag: " + super.toString();
-    }
+  @Column(name = "name")
+  private String name;
 }

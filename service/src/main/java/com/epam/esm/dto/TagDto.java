@@ -1,36 +1,19 @@
 package com.epam.esm.dto;
 
-public class TagDto {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
-    private long id;
-    private String name;
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Relation(collectionRelation = "tags", itemRelation = "tag")
+public class TagDto extends RepresentationModel<TagDto> {
 
-    public TagDto() {
-    }
-
-    public TagDto(String name) {
-        this.name = name;
-    }
-
-    public TagDto(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+  private long id;
+  private String name;
 }
